@@ -66,6 +66,113 @@ async function makePdf() {
   return pdf.save({ useObjectStreams: false })
 }
 
+/**
+ * A Simplified-Chinese PDF built by hand rather than through pdf-lib.
+ *
+ * pdf-lib can only embed the standard Type1 fonts, which carry no CJK glyphs,
+ * so every other PDF fixture here is English-only — leaving the plugin's
+ * headline capability, order-correct Chinese retrieval, untested on the one
+ * format where CJK text extraction is hardest.
+ *
+ * Text extraction reads the ToUnicode CMap, not the glyph outlines, so a
+ * Type0/Identity-H font with a ToUnicode table and no embedded font file
+ * exercises exactly the path under test. That keeps the fixture deterministic
+ * and adds no font file and no dependency.
+ *
+ * The FontDescriptor is required, not decorative: without it pdf.js stops
+ * treating the font as two-byte CID and decodes each half of every code as a
+ * separate character, yielding NUL-interleaved text.
+ */
+export function makeCjkPdf() {
+  const pages = [
+    [
+      '合成数据 - 季度流程绩效报告',
+      '流程绩效指标 MET-HR-02 第三季度目标为 95 percent',
+      '责任人 合成 HRBP'
+    ],
+    [
+      '干扰页 - 不得作为答案',
+      '绩效流程改进说明 DISTRACTOR-REVERSED',
+      '本页刻意颠倒词序以检验语序敏感性'
+    ]
+  ]
+  const chars = [...new Set(pages.flat().join(''))]
+  const cid = new Map(chars.map((char, index) => [char, index + 1]))
+  const code = (char) => cid.get(char).toString(16).padStart(4, '0')
+  const hex = (line) => [...line].map(code).join('')
+  const bfchar = chars
+    .map((char) => `<${code(char)}> <${char.codePointAt(0).toString(16).padStart(4, '0')}>`)
+    .join('\n')
+
+  const toUnicode = [
+    '/CIDInit /ProcSet findresource begin',
+    '12 dict begin',
+    'begincmap',
+    '/CMapName /dsh-evidence-synthetic def',
+    '/CMapType 2 def',
+    '/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def',
+    '1 begincodespacerange',
+    '<0000> <FFFF>',
+    'endcodespacerange',
+    `${chars.length} beginbfchar`,
+    bfchar,
+    'endbfchar',
+    'endcmap',
+    'CMapName currentdict /CMap defineresource pop',
+    'end',
+    'end'
+  ].join('\n')
+
+  const objects = ['']
+  const contents = []
+  for (const lines of pages) {
+    let y = 720
+    const stream = `BT /F1 14 Tf\n${lines
+      .map((line) => {
+        const op = `1 0 0 1 72 ${y} Tm <${hex(line)}> Tj`
+        y -= 24
+        return op
+      })
+      .join('\n')}\nET`
+    contents.push(stream)
+  }
+
+  const pageIds = [4, 5]
+  const contentIds = [6, 7]
+  objects[1] = '<< /Type /Catalog /Pages 2 0 R >>'
+  objects[2] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`
+  objects[3] = '<< /Type /Font /Subtype /Type0 /BaseFont /STSong-Light /Encoding /Identity-H /DescendantFonts [8 0 R] /ToUnicode 9 0 R >>'
+  for (const [index, id] of pageIds.entries()) {
+    objects[id] =
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] ` +
+      `/Resources << /Font << /F1 3 0 R >> >> /Contents ${contentIds[index]} 0 R >>`
+  }
+  for (const [index, id] of contentIds.entries()) {
+    objects[id] = `<< /Length ${contents[index].length} >>\nstream\n${contents[index]}\nendstream`
+  }
+  objects[8] =
+    '<< /Type /Font /Subtype /CIDFontType0 /BaseFont /STSong-Light ' +
+    '/CIDSystemInfo << /Registry (Adobe) /Ordering (GB1) /Supplement 2 >> /DW 1000 /FontDescriptor 10 0 R >>'
+  objects[9] = `<< /Length ${toUnicode.length} >>\nstream\n${toUnicode}\nendstream`
+  objects[10] =
+    '<< /Type /FontDescriptor /FontName /STSong-Light /Flags 4 ' +
+    '/FontBBox [-100 -200 1100 900] /ItalicAngle 0 /Ascent 880 /Descent -120 /CapHeight 700 /StemV 80 >>'
+
+  let out = '%PDF-1.7\n'
+  const offsets = []
+  for (let id = 1; id < objects.length; id += 1) {
+    offsets[id] = out.length
+    out += `${id} 0 obj\n${objects[id]}\nendobj\n`
+  }
+  const startxref = out.length
+  out += `xref\n0 ${objects.length}\n0000000000 65535 f \n`
+  for (let id = 1; id < objects.length; id += 1) {
+    out += `${String(offsets[id]).padStart(10, '0')} 00000 n \n`
+  }
+  out += `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${startxref}\n%%EOF\n`
+  return new Uint8Array(Buffer.from(out, 'latin1'))
+}
+
 async function makeDocx() {
   const zip = new JSZip()
   addZipText(zip, '[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8"?>
@@ -228,6 +335,7 @@ export async function generateFixtures(outputDir = DEFAULT_FIXTURE_DIR) {
   const docxBytes = await makeDocx()
   const outputs = [
     ['atlas-kickoff.pdf', await makePdf()],
+    ['流程绩效-季度报告.pdf', makeCjkPdf()],
     [docxName, docxBytes],
     ['atlas-metrics.xlsx', await makeXlsx()],
     ['atlas-strategy.pptx', await makePptx()]

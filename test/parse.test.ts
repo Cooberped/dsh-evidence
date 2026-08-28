@@ -6,6 +6,7 @@ import assert from 'node:assert/strict'
 import JSZip from 'jszip'
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import { PDF_PAGE_SEPARATOR, parsePdf, splitPdfPages } from '../src/parse/pdf.ts'
+import { makeCjkPdf } from '../benchmark/generate-fixtures.mjs'
 import { parseDocx } from '../src/parse/docx.ts'
 import { parseXlsx, parseXlsxWorkbook, projectXlsx } from '../src/parse/xlsx.ts'
 import { parsePptx } from '../src/parse/pptx.ts'
@@ -158,6 +159,28 @@ test('pdf text extraction', async () => {
   const pdf = await makePdf('Hello PDF world')
   const text = await parsePdf(pdf)
   assert.match(text, /Hello PDF world/)
+})
+
+test('pdf text extraction reads Simplified Chinese through the ToUnicode table', async () => {
+  // pdf-lib can only embed the standard Type1 fonts, so every other PDF sample
+  // in this file is Latin-only. This fixture is a hand-built Type0/Identity-H
+  // document, which is how a real Chinese PDF encodes text, and it is the only
+  // coverage the CJK extraction path has.
+  const bytes = makeCjkPdf()
+  const text = await parsePdf(bytes)
+
+  assert.equal(text.includes('流程绩效指标 MET-HR-02'), true, text)
+  // A CID font whose descendant lacks a FontDescriptor makes pdf.js fall back to
+  // single-byte decoding and interleave NUL between every character. Assert the
+  // absence directly: the text would still "contain Chinese" if that regressed.
+  assert.equal(text.includes('\u0000'), false, 'CID text decoded one byte at a time')
+
+  const pages = splitPdfPages(text)
+  assert.equal(pages.length, 2)
+  assert.equal(pages[0].includes('流程绩效'), true)
+  // Page two carries the reversed-order distractor; word order must separate them.
+  assert.equal(pages[1].includes('绩效流程'), true)
+  assert.equal(pages[0].includes('DISTRACTOR-REVERSED'), false)
 })
 
 test('pdf separated text runs get a space inserted', async () => {
