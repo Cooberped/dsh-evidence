@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="560" viewBox="0 0 1440 560" role="img" aria-labelledby="title desc">
-  <title id="title">dsh-files model evidence loop</title>
+  <title id="title">dsh-evidence: the model evidence loop</title>
   <desc id="desc">The recommended model behavior: inventory attached files, search narrowly, expand an exact coordinate with its version, and answer from evidence.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7f9fc"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>

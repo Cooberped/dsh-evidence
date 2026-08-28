@@ -506,7 +506,7 @@ export function createUploadHandler(options: UploadOptions) {
         jsonError(res, 403, err.message)
         return
       }
-      console.error('[dsh-files] upload persist failed:', err)
+      console.error('[dsh-evidence] upload persist failed:', err)
       res.writeHead(500, { 'content-type': 'application/json' })
       res.end(JSON.stringify({ error: 'write failed' }))
     } finally {
@@ -603,7 +603,7 @@ export function createSweeper(
     const current = typeof roots === 'function' ? roots() : [roots]
     for (const root of new Set(current)) {
       void sweep(root, ttlMs, now).catch((err) => {
-        console.error('[dsh-files] upload sweep failed:', err)
+        console.error('[dsh-evidence] upload sweep failed:', err)
       })
     }
   }, intervalMs)

@@ -1,6 +1,7 @@
 # Release Process / 发布流程
 
-This is the maintainer runbook for the Cooberped community fork of `dsh-files`.
+This is the maintainer runbook for `dsh-evidence`, the Cooberped community
+fork of `taxueseek/dsh-files`.
 It separates source integration, GitHub release, and npm publication so that a
 successful build cannot publish externally without an explicit maintainer
 decision.
@@ -46,9 +47,10 @@ Before the first public release, configure and verify:
 - GitHub Private Vulnerability Reporting is enabled;
 - the release environment requires maintainer approval;
 - npm trusted publishing/provenance is configured before tokenless publication;
-- npm scope ownership is verified. Do not publish the unrelated, already-owned
-  unscoped package name `dsh-files`; the intended scoped identity must match
-  `package.json` and the verified npm account or organization.
+- npm scope ownership is verified. Publish only under the scope: the unscoped
+  names `dsh-files` and `dsh-evidence` are not this project's to take, and the
+  scoped identity must match `package.json` and the verified npm account or
+  organization.
 
 ## Release gates / 发布 Gate
 

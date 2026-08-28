@@ -1,4 +1,4 @@
-// Shared HTTP network guards for the dsh-files upload surface. Mirrors the
+// Shared HTTP network guards for the dsh-evidence upload surface. Mirrors the
 // official dsh-files-button contract: loopback-only host by default, plus
 // same-origin and same-site checks. The upload endpoint runs these before
 // touching any session or path.

@@ -1,5 +1,5 @@
 name: Bug report / 缺陷报告
-description: Report a reproducible dsh-files defect without private data / 报告可复现且不含隐私数据的缺陷
+description: Report a reproducible dsh-evidence defect without private data / 报告可复现且不含隐私数据的缺陷
 title: "[Bug]: "
 body:
   - type: markdown
@@ -11,7 +11,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: dsh-files version and commit / 版本与 commit
+      label: dsh-evidence version and commit / 版本与 commit
       placeholder: "0.6.0-beta.1 / abc1234"
     validations:
       required: true

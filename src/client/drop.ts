@@ -1,5 +1,5 @@
 // Browser drag/drop arbitration shared by the client face and focused tests.
-// Harness owns pure raster-image drops. dsh-files owns any batch containing a
+// Harness owns pure raster-image drops. dsh-evidence owns any batch containing a
 // document or directory, then routes raster members back through the native
 // image service and documents through the local read_document path.
 

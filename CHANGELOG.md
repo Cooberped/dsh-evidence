@@ -2,6 +2,9 @@
 
 ## 0.6.0-beta.1（Cooberped 社区发布候选，尚未发布 npm）
 
+- 补完改名：此前只换了仓库 URL 与包名，产品名本身在多处没跟上——三张配图的标题与 wordmark、两个 README 的 H1 与 img alt、CONTRIBUTING/SECURITY/benchmark README/issue 模板，以及源码里的 logger 名、配置错误前缀和注释。其中 `cd dsh-files` 是**真缺陷**：`git clone` 产生的目录叫 `dsh-evidence`，照 README 敲第二步就会失败。配图改的是 `assets/source/content.mjs` 后重新生成，未手改 SVG。
+- 刻意保留三类同名项：`.dsh-filess` 上传目录与 `$DSH_HOME/dsh-files/index` 索引目录持有用户数据，改名会静默孤儿化现有安装；`dsh-files-button` 指的是官方上游插件，不是本项目。索引路径处已加注释说明原因。
+- hero 的 wordmark 现在受 `assertFits` 约束。它就是产品名，改名时会变长，而此前没有任何检查覆盖它。
 - **运行时地板从 Node `>=20.12.0` 提到 `>=22.13.0`。** pdfjs 5 与 6 都声明 `>=22.13.0 || >=24`，没有任何一个仍在维护的 pdfjs 版本支持 Node 20；而 Node 20 本身已于 2026-04-30 结束支持。为留住一个不再收安全更新的运行时，把解析攻击者可控字节的组件冻在停维护分支上，两头都不划算。CI 中原 `node20-fallback` 更名为 `node-floor` 并改跑 22.13.0——它验证的一直是「最低支持运行时」这个契约，而不是「Node 20」这个数字。
 - `pdfjs-dist` 由 `^4.10.38` 升到 `^6.2.108`。4.x 最后一次发布是 2025-01-01，已停止维护近 20 个月，而 PDF 解析是本插件唯一处理攻击者可控字节的组件，不宜冻结在不再发补丁的分支上。迁移改动 3 行（v6 把 `destroy()` 从文档代理移到 loading task），同一 PDF 的提取结果与 v4 逐字节一致。`THIRD_PARTY_NOTICES.md` 已按实测复核更新：字体仍为 Liberation Sans 1.07.4，上游许可证文本错配在 `6.2.108` 中依然存在（该版本早于 2026-08-10 合并的修正）。
 - 补齐中文 PDF 的检索覆盖。此前 DOCX/XLSX/PPTX 都有中文素材，唯独 PDF 素材全英文——因为 pdf-lib 只能嵌标准 Type1 字体，编码不了中文；于是「中文语序正确检索」这项招牌能力在最容易出问题的格式上从未被验证。新增手工构造的 Type0/Identity-H 中文素材：文本提取读的是 ToUnicode 表而非字形，因此无需嵌入字体文件，也不引入任何新依赖，且完全确定性。benchmark 新增 `ordered-cjk-phrase-pdf` 用例（第 1 页命中「流程绩效」，第 2 页的「绩效流程」干扰项必须不被采纳），双后端 12/12 通过。

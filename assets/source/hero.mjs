@@ -47,6 +47,8 @@ export function render(t) {
 
   assertFits(t.query, { fontSize: 15, available: slotWidth(342, 18), where: 'hero:query' })
   assertFits(t.evidence, { fontSize: 14, available: slotWidth(342, 18), where: 'hero:evidence' })
+  // The wordmark is the product name, so it changes when the project is renamed.
+  assertFits(t.wordmark, { fontSize: 78, weight: 760, available: 780, where: 'hero:wordmark' })
   assertFits(t.headline, { fontSize: 28, weight: 520, available: 780, where: 'hero:headline' })
   assertFits(t.tagline, { fontSize: 18, available: 780, where: 'hero:tagline' })
 

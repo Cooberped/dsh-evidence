@@ -60,9 +60,9 @@ still Liberation Sans 1.07.4, byte-identical in intent to the 4.x baseline, and
 the mismatched licence file persists. This notice records the actual 1.07.4
 license rather than repeating the mismatched file.
 
-The `dsh-files` PDF parser imports `pdfjs-dist/legacy/build/pdf.mjs`, performs
+The `dsh-evidence` PDF parser imports `pdfjs-dist/legacy/build/pdf.mjs`, performs
 text-layer extraction, sets `useSystemFonts: true`, and does not configure a
-`standardFontDataUrl` or `cMapUrl`. The `dsh-files` npm tarball uses a project
+`standardFontDataUrl` or `cMapUrl`. The `dsh-evidence` npm tarball uses a project
 file allowlist and does **not embed or copy the `pdfjs-dist` standard-font or
 CMap files into the tarball**. Installing dependencies may place the separate
 `pdfjs-dist` package and its assets on the consumer's disk; anyone who later

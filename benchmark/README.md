@@ -1,4 +1,4 @@
-# dsh-files document benchmark
+# dsh-evidence document benchmark
 
 这个目录只保存**合成资料**与公开的验收契约，不保存真实业务文档、真实答案或模型输出。
 

@@ -5,10 +5,10 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/hero.svg" width="100%" alt="dsh-files turns local files into versioned evidence through upload, retrieval, coordinate reads, and native vision.">
+  <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/hero.svg" width="100%" alt="dsh-evidence turns local files into versioned evidence through upload, retrieval, coordinate reads, and native vision.">
 </p>
 
-# dsh-files
+# dsh-evidence
 
 **Attach files in DeepSeek Harness and let the model actually read them.**
 
@@ -28,7 +28,7 @@ Upload files or a whole folder from the Web composer. Parsing and indexing stay 
 Files become addressable evidence rather than prompt baggage. That is the whole design.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/architecture.svg" width="100%" alt="dsh-files architecture: composer, local ingest, private retrieval, model tools, and native vision branch.">
+  <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/architecture.svg" width="100%" alt="dsh-evidence architecture: composer, local ingest, private retrieval, model tools, and native vision branch.">
 </p>
 
 ## Install from source
@@ -37,7 +37,7 @@ You need the DeepSeek Harness CLI with the `web` profile (validated baseline: np
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
-cd dsh-files
+cd dsh-evidence
 pnpm install --frozen-lockfile
 pnpm build
 

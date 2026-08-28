@@ -16,10 +16,10 @@ export function fileName(base, locale) {
 export const content = {
   hero: {
     en: {
-      title: 'dsh-files',
+      title: 'dsh-evidence',
       desc: 'A community DeepSeek Harness plugin that turns local files into versioned evidence through upload, local retrieval, coordinate reads, and native vision handoff.',
       badge: 'COMMUNITY PLUGIN · SOURCE BETA',
-      wordmark: 'dsh-files',
+      wordmark: 'dsh-evidence',
       headline: 'Files become evidence, on demand.',
       tagline: 'Upload locally · retrieve precisely · expand by coordinate · keep images native',
       pills: ['Multi-file upload', 'Local retrieval', 'Versioned reads', 'Native vision'],
@@ -36,10 +36,10 @@ export const content = {
       evidence: 'Sheet “People”!B12:F18 · v:8f3…'
     },
     zh: {
-      title: 'dsh-files',
+      title: 'dsh-evidence',
       desc: '一个社区维护的 DeepSeek Harness 插件，通过上传、本地检索、坐标回读与原生视觉转交，把本地文件变成带版本的证据。',
       badge: '社区插件 · 源码 BETA',
-      wordmark: 'dsh-files',
+      wordmark: 'dsh-evidence',
       headline: '让文件随时变成可引用的证据',
       tagline: '本地上传 · 精准检索 · 按坐标展开 · 图片原生直通',
       pills: ['多文件上传', '本地检索', '带版本读取', '原生视觉'],
@@ -61,7 +61,7 @@ export const content = {
 
   architecture: {
     en: {
-      title: 'dsh-files architecture',
+      title: 'dsh-evidence architecture',
       desc: 'Four-layer architecture from composer upload to local parsing and retrieval, versioned model tools, and the native vision branch.',
       headline: 'Small package. Four layers. One evidence loop.',
       subhead: 'The plugin keeps parsing and retrieval local; only selected tool evidence enters the model context.',
@@ -94,7 +94,7 @@ export const content = {
       vision: ['IMAGES', 'Harness native attachment rail', 'Provider-neutral image_url', 'Any declared vision-capable model']
     },
     zh: {
-      title: 'dsh-files 架构',
+      title: 'dsh-evidence 架构',
       desc: '四层架构：从输入框上传，到本地解析与检索、带版本的模型工具，以及原生视觉分支。',
       headline: '小体积。四层结构。一个证据闭环。',
       subhead: '解析与检索都留在本机；只有被选中的工具证据才进入模型上下文。',
@@ -130,7 +130,7 @@ export const content = {
 
   'evidence-loop': {
     en: {
-      title: 'dsh-files model evidence loop',
+      title: 'dsh-evidence: the model evidence loop',
       desc: 'The recommended model behavior: inventory attached files, search narrowly, expand an exact coordinate with its version, and answer from evidence.',
       headline: 'The model reads less—and knows where every fact came from.',
       subhead: 'A compact tool contract replaces repeated full-document scans.',
@@ -166,7 +166,7 @@ export const content = {
       ]
     },
     zh: {
-      title: 'dsh-files 模型证据循环',
+      title: 'dsh-evidence：模型证据循环',
       desc: '推荐的模型行为：先盘点附件、再精确检索、按坐标与版本展开，最后只依据证据回答。',
       headline: '模型读得更少，每条结论都知道出处。',
       subhead: '一套紧凑的工具约定，取代反复的全文扫描。',

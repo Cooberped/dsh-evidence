@@ -1,11 +1,11 @@
-# Contributing to dsh-files / 参与 dsh-files 共建
+# Contributing to dsh-evidence / 参与 dsh-evidence 共建
 
-Thank you for helping improve `dsh-files`. This repository is the
+Thank you for helping improve `dsh-evidence`. This repository is the
 **Cooberped community fork** of [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
 We preserve the upstream Git history, attribution, and MIT notice while
 maintaining an independent community release.
 
-感谢你参与 `dsh-files`。本仓库是
+感谢你参与 `dsh-evidence`。本仓库是
 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files) 的
 **Cooberped 社区维护 fork**。我们保留上游 Git 历史、署名和 MIT 声明，并独立维护社区发行版。
 

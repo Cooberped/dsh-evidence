@@ -1,4 +1,4 @@
-// dsh-files — a dual-face DeepSeek Harness plugin: one cordis row, one apply.
+// dsh-evidence — a dual-face DeepSeek Harness plugin: one cordis row, one apply.
 // capabilities:
 //   1. read_document tool (host): sniffed-format text extraction for
 //      text/PDF/DOCX/XLSX/PPTX with size pre-check and LRU parse cache.
@@ -18,7 +18,7 @@ import { ParseCache } from './cache.ts'
 import { parseHost } from './guard.ts'
 
 /** Cordis plugin name. The bundle row id in cordis.patch.yml is chosen separately (`files-toolkit`). */
-export const name = 'dsh-files'
+export const name = 'dsh-evidence'
 
 /** Services required by this plugin. */
 export const inject = ['tools', 'fs', 'systemPrompt', 'webServer', 'sessions']
@@ -102,6 +102,9 @@ export const Config = z.object({
   workspaceMaxFiles: z.number().default(500),
   /** Local retrieval is additive: read_document remains the coordinate expander. */
   retrievalEnabled: z.boolean().default(true),
+  // The directory name predates the rename to dsh-evidence and is deliberately
+  // left alone: it holds a live index, and renaming it would silently orphan
+  // every existing installation's data for a cosmetic gain.
   retrievalIndexDir: z.string().default(join(DSH_HOME, 'dsh-files', 'index')),
   retrievalMaxFiles: z.number().default(12),
   retrievalMaxResults: z.number().default(12),
@@ -114,7 +117,7 @@ export const Config = z.object({
 })
 
 function assertPositiveInteger(value: number, label: string): void {
-  if (!Number.isInteger(value) || value < 1) throw new Error(`dsh-files: ${label} must be a positive integer`)
+  if (!Number.isInteger(value) || value < 1) throw new Error(`dsh-evidence: ${label} must be a positive integer`)
 }
 
 export function apply(ctx: any, config: DocsConfig): void {
@@ -141,23 +144,23 @@ export function apply(ctx: any, config: DocsConfig): void {
     assertPositiveInteger(value, label)
   }
   if (!Number.isInteger(config.maxUploadBytesPerSession) || config.maxUploadBytesPerSession < 0) {
-    throw new Error('dsh-files: maxUploadBytesPerSession must be a non-negative integer')
+    throw new Error('dsh-evidence: maxUploadBytesPerSession must be a non-negative integer')
   }
   // 启动时校验 trustedHosts 条目，拼写错误 loud fail（对齐官方 assertTrustedAuthority）。
   for (const entry of config.trustedHosts) {
     if (parseHost(entry) === null) {
-      throw new Error(`dsh-files: trustedHosts entry "${entry}" is not a valid host (expected "example.com" or "example.com:443")`)
+      throw new Error(`dsh-evidence: trustedHosts entry "${entry}" is not a valid host (expected "example.com" or "example.com:443")`)
     }
   }
 
   const cache = new ParseCache(config.cacheEntries, config.cacheMaxBytes)
 
   if (config.retrievalEnabled) {
-    if (config.retrievalIndexDir.trim() === '') throw new Error('dsh-files: retrievalIndexDir must be a non-empty path')
+    if (config.retrievalIndexDir.trim() === '') throw new Error('dsh-evidence: retrievalIndexDir must be a non-empty path')
     if (!isAbsolute(config.retrievalIndexDir)) {
-      throw new Error('dsh-files: retrievalIndexDir must be an absolute private path (omit it to use the DSH_HOME default)')
+      throw new Error('dsh-evidence: retrievalIndexDir must be an absolute private path (omit it to use the DSH_HOME default)')
     }
-    const logger = ctx.logger('dsh-files')
+    const logger = ctx.logger('dsh-evidence')
     const createdBackend = createRetrievalBackend({
       indexDir: config.retrievalIndexDir,
       logger

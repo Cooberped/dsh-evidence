@@ -1,10 +1,10 @@
 # Security Policy / 安全策略
 
-`dsh-files` handles local files and model-visible document content. Please use
+`dsh-evidence` handles local files and model-visible document content. Please use
 coordinated disclosure and never test against another person's documents,
 sessions, machine, or service without explicit permission.
 
-`dsh-files` 会处理本地文件和可被模型读取的文档内容。请采用协调披露；未经明确
+`dsh-evidence` 会处理本地文件和可被模型读取的文档内容。请采用协调披露；未经明确
 授权，不得在他人的文档、会话、设备或服务上测试漏洞。
 
 ## Supported versions / 支持版本

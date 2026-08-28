@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="620" viewBox="0 0 1440 620" role="img" aria-labelledby="title desc">
-  <title id="title">dsh-files</title>
+  <title id="title">dsh-evidence</title>
   <desc id="desc">A community DeepSeek Harness plugin that turns local files into versioned evidence through upload, local retrieval, coordinate reads, and native vision handoff.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -25,7 +25,7 @@
   <g transform="translate(92 82)" font-family="Inter, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;, &quot;Microsoft YaHei&quot;, &quot;Noto Sans CJK SC&quot;, &quot;Source Han Sans SC&quot;, ui-sans-serif, system-ui, sans-serif">
     <rect width="391" height="38" rx="19" fill="#f3c66b" opacity=".12" stroke="#f3c66b" stroke-opacity=".42"/>
     <text x="20" y="25" fill="#f6d594" font-size="15" font-weight="700" letter-spacing="2">COMMUNITY PLUGIN · SOURCE BETA</text>
-    <text x="0" y="150" fill="#f8fbff" font-size="78" font-weight="760" letter-spacing="-3">dsh-files</text>
+    <text x="0" y="150" fill="#f8fbff" font-size="78" font-weight="760" letter-spacing="-3">dsh-evidence</text>
     <rect x="2" y="176" width="104" height="7" rx="3.5" fill="url(#accent)"/>
     <text x="0" y="242" fill="#d8e4ef" font-size="28" font-weight="520">Files become evidence, on demand.</text>
     <text x="0" y="288" fill="#8fa5b8" font-size="18">Upload locally · retrieve precisely · expand by coordinate · keep images native</text>

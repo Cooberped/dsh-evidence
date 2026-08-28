@@ -47,12 +47,12 @@ not hand-edit the SVGs, and update the hashes below after rebuilding.
 
 | Asset | SHA-256 | Purpose | License/status |
 | --- | --- | --- | --- |
-| `readme/hero.svg` | `de50fd53434039e9d15d1e069d20d85d0630b339619a48b5155cf775b0a5d6f4` | Project identity and four-capability overview | Repository-original SVG; contributed under MIT; `CONFIRMED` |
-| `readme/architecture.svg` | `b3acf7155074a3c6b26dddca50b11771483c7ec45c23f59693608045ba55c153` | Composer → local ingest → private retrieval → model tools, plus native vision branch | Repository-original SVG; contributed under MIT; `CONFIRMED` |
-| `readme/evidence-loop.svg` | `dba1e3db5d5eebf9f3db68bad2ea0573ead2adb5eced9f755d23ac58bc5eb8b5` | Inventory → retrieve → expand → answer workflow | Repository-original SVG; contributed under MIT; `CONFIRMED` |
-| `readme/hero.zh.svg` | `70f46250af84cd4aab1a18e13e3123c820a226a8f9aad71782ff2e9c165f5319` | Simplified-Chinese hero for `README.zh.md` | Repository-original SVG; contributed under MIT; `CONFIRMED` |
-| `readme/architecture.zh.svg` | `83e5fcb3685df3be9acee6910854038b4e87a1fe3b741a4c483c8a5c70aac634` | Simplified-Chinese architecture diagram for `README.zh.md` | Repository-original SVG; contributed under MIT; `CONFIRMED` |
-| `readme/evidence-loop.zh.svg` | `0ab4f0c512d5fa7e9bbfa63efe1471e73f38ed7c7ebcf203bcf27ab993b87775` | Simplified-Chinese evidence-loop diagram for `README.zh.md` | Repository-original SVG; contributed under MIT; `CONFIRMED` |
+| `readme/hero.svg` | `a8a933061dcbf9c4a50a716f3b9396431c7f9ed01e9ff44689f6cae1faaf8274` | Project identity and four-capability overview | Repository-original SVG; contributed under MIT; `CONFIRMED` |
+| `readme/architecture.svg` | `f380649e274385b5f44c9d45ef9bc74440c49e9f7d442637cf15e851742d2737` | Composer → local ingest → private retrieval → model tools, plus native vision branch | Repository-original SVG; contributed under MIT; `CONFIRMED` |
+| `readme/evidence-loop.svg` | `272ab0ef0f5a4c4d5b3de00eec569e1ef5078dcdb3f808660fcf55211b5ad250` | Inventory → retrieve → expand → answer workflow | Repository-original SVG; contributed under MIT; `CONFIRMED` |
+| `readme/hero.zh.svg` | `c7000d7288442835181cf32f945a6cead36daf36146b6ea1b6e7c0e2adc3d130` | Simplified-Chinese hero for `README.zh.md` | Repository-original SVG; contributed under MIT; `CONFIRMED` |
+| `readme/architecture.zh.svg` | `483c07fe450585c68dbaf108727bb41bb097dc36f83962fa22c86bb456b759eb` | Simplified-Chinese architecture diagram for `README.zh.md` | Repository-original SVG; contributed under MIT; `CONFIRMED` |
+| `readme/evidence-loop.zh.svg` | `ea6960cf94e5ad4b8ac6d535e5b8ea94af5c07d9fb452a811c21c72d67066e56` | Simplified-Chinese evidence-loop diagram for `README.zh.md` | Repository-original SVG; contributed under MIT; `CONFIRMED` |
 
 Confirmation / 确认：
 

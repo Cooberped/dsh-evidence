@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" viewBox="0 0 1440 720" role="img" aria-labelledby="title desc">
-  <title id="title">dsh-files architecture</title>
+  <title id="title">dsh-evidence architecture</title>
   <desc id="desc">Four-layer architecture from composer upload to local parsing and retrieval, versioned model tools, and the native vision branch.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#091321"/><stop offset="1" stop-color="#10283a"/></linearGradient>

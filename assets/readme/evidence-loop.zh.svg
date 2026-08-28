@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="560" viewBox="0 0 1440 560" role="img" aria-labelledby="title desc">
-  <title id="title">dsh-files 模型证据循环</title>
+  <title id="title">dsh-evidence：模型证据循环</title>
   <desc id="desc">推荐的模型行为：先盘点附件、再精确检索、按坐标与版本展开，最后只依据证据回答。</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7f9fc"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
