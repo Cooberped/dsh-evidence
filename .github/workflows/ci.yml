@@ -28,6 +28,7 @@ jobs:
       - name: Require author DCO after the documented bootstrap boundary
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           LEGACY_BOUNDARY: ba6cead1b33a5bc53449918350be7618504076bf
         run: |
           start="$BASE_SHA"
@@ -38,6 +39,19 @@ jobs:
           missing=0
           while IFS= read -r commit; do
             author="$(git show -s --format='%an <%ae>' "$commit")"
+
+            # Dependabot's commits are machine-generated and carry no trailer, so a
+            # DCO gate would block every dependency update forever. DCO is a human
+            # contributor's assertion about work they wrote; a bot has nothing to
+            # certify. Both the pull-request author and the commit author must be
+            # the bot, so a person cannot borrow the identity to skip the check,
+            # and a human commit riding along in a bot pull request is still checked.
+            if [ "$PR_AUTHOR" = 'dependabot[bot]' ] && printf '%s\n' "$author" \
+              | grep -qE '^dependabot\[bot\] <[0-9]+\+dependabot\[bot\]@users\.noreply\.github\.com>$'; then
+              echo "::notice::DCO not required for bot commit $commit ($author)"
+              continue
+            fi
+
             if ! git show -s --format='%(trailers:key=Signed-off-by,valueonly)' "$commit" \
               | grep -Fqx -- "$author"; then
               echo "::error::Commit $commit is not signed off by its author: $author"

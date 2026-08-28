@@ -109,6 +109,18 @@ not be extended to later commits.
 首次公开仓库保留截至上述 commit 的治理前开发历史，不追补他人签名；该边界之后
 创建的所有贡献均须遵守 DCO，且不得扩大此一次性例外。
 
+Dependabot's own commits are exempt. They are machine-generated, carry no
+trailer, and a bot has nothing to certify — without the exemption every
+dependency update would be blocked forever. The exemption is narrow: the check
+requires both the pull request and the commit to be authored by
+`dependabot[bot]`, so the identity cannot be borrowed, and a human commit
+riding along in a bot pull request is still checked.
+
+Dependabot 自身的 commit 属于例外：它们由机器生成、不带 trailer，机器人也没有可
+供声明的著作权；不设例外的话，所有依赖更新都会被永久挡住。该例外范围很窄——检查
+要求 PR 与 commit 的作者同为 `dependabot[bot]`，因此身份无法被借用；机器人 PR 中
+夹带的人类 commit 仍会被检查。
+
 ## Pull-request process / PR 流程
 
 1. Fork the repository and create a topic branch from current `main`.
