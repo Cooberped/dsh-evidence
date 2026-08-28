@@ -22,7 +22,7 @@ components remain under their own licenses and are not relicensed as MIT.
 | Package | Resolved version | License | Upstream |
 | --- | ---: | --- | --- |
 | `fflate` | 0.8.3 | MIT | <https://github.com/101arrowz/fflate> |
-| `pdfjs-dist` | 4.10.38 | Apache-2.0, with separately licensed data files described below | <https://github.com/mozilla/pdf.js> |
+| `pdfjs-dist` | 6.2.108 | Apache-2.0, with separately licensed data files described below | <https://github.com/mozilla/pdf.js> |
 | `read-excel-file` | 9.3.10 | MIT | <https://gitlab.com/catamphetamine/read-excel-file> |
 | `saxen` | 11.1.1 | MIT | <https://github.com/nikku/saxen> |
 
@@ -50,12 +50,14 @@ upstream npm package also contains data files with their own notices:
 - `cmaps/` carries its own upstream `LICENSE` notice.
 
 Those files are **not relicensed under Apache-2.0 or this project's MIT
-license**. In the currently resolved `pdfjs-dist@4.10.38`, the accompanying
+license**. In the currently resolved `pdfjs-dist@6.2.108`, the accompanying
 `LICENSE_LIBERATION` incorrectly contains OFL-1.1 text even though OFL applies
 only to Liberation 2.0 and later. Mozilla confirmed and corrected this upstream
 in [pdf.js PR #21750](https://github.com/mozilla/pdf.js/pull/21750), merged on
-2026-08-10. No npm release containing that correction had been verified at
-this release-candidate baseline, so this notice records the actual 1.07.4
+2026-08-10; `6.2.108` was published on 2026-07-28 and therefore predates it.
+The shipped font was checked against this notice rather than assumed: it is
+still Liberation Sans 1.07.4, byte-identical in intent to the 4.x baseline, and
+the mismatched licence file persists. This notice records the actual 1.07.4
 license rather than repeating the mismatched file.
 
 The `dsh-files` PDF parser imports `pdfjs-dist/legacy/build/pdf.mjs`, performs
@@ -71,7 +73,9 @@ texts and notices.
 许可为 Apache-2.0；但本项目自己的 npm tarball 也没有复制或内嵌这些字体。依赖
 安装后，字体仍属于独立的 `pdfjs-dist` 包，并继续受各自 BSD 或
 `GPL-2.0-only WITH Liberation font exception` 条款约束。当前上游 npm 包内把
-Liberation 1.07.4 错配为 OFL-1.1 的许可证文件，不能作为本项目的许可依据。
+Liberation 1.07.4 错配为 OFL-1.1 的许可证文件，不能作为本项目的许可依据；升级到
+`6.2.108` 后已实测复核，该字体仍为 Liberation Sans 1.07.4，错配的许可证文件也依然
+存在（`6.2.108` 发布于 2026-07-28，早于 2026-08-10 合并的上游修正）。
 
 ## Distribution checklist / 分发检查
 

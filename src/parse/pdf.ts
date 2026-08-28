@@ -25,9 +25,11 @@ export async function parsePdf(bytes: Uint8Array): Promise<string> {
   // pdfjs 会把传入的 data.buffer 作为 transferable 转移（Node 26 的 LoopbackPort
   // 对 detached buffer 的二次 transfer 抛 DataCloneError），因此解析前必须复制
   // 一份工作副本，保住调用方的 bytes 不被 detach。
-  const doc = await getDocument({
+  const loadingTask = getDocument({
     data: new Uint8Array(bytes),
     // Node has no web worker; these options keep the legacy build self-contained.
+    // pdf.js dropped both from its public typings in v6 while still honouring
+    // them at runtime, which is why the cast below is required rather than tidy.
     disableWorker: true,
     isEvalSupported: false,
     useSystemFonts: true
@@ -35,7 +37,10 @@ export async function parsePdf(bytes: Uint8Array): Promise<string> {
     disableWorker: boolean
     isEvalSupported: boolean
     useSystemFonts: boolean
-  }).promise
+  })
+  // v6 moved destroy() from the document proxy to the loading task, so the task
+  // has to stay in scope for the whole read rather than being awaited inline.
+  const doc = await loadingTask.promise
   try {
     const pages: string[] = []
     for (let pageNo = 1; pageNo <= doc.numPages; pageNo++) {
@@ -84,6 +89,6 @@ export async function parsePdf(bytes: Uint8Array): Promise<string> {
     }
     return text
   } finally {
-    await doc.destroy()
+    await loadingTask.destroy()
   }
 }
