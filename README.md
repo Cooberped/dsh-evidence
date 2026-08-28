@@ -33,7 +33,7 @@ Files become addressable evidence rather than prompt baggage. That is the whole 
 
 ## Install from source
 
-You need the DeepSeek Harness CLI with the `web` profile (validated baseline: npm `@deepseek-ai/dsh@0.1.1-rc.2`), Node.js `>=20.12.0`, and `pnpm` on `PATH`.
+You need the DeepSeek Harness CLI with the `web` profile (validated baseline: npm `@deepseek-ai/dsh@0.1.1-rc.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -174,7 +174,7 @@ dsh --profile web --dump-config
 
 Less common settings and their authoritative defaults live in [`src/index.ts`](src/index.ts). An explicit `retrievalIndexDir` must be an absolute private path; `~` is not expanded.
 
-**Runtime backend.** The package accepts Node.js `>=20.12.0`. A persistent retrieval index additionally requires the actual Harness runtime to provide Node.js `>=22.5.0`, `node:sqlite` and FTS5; Node 20 or any failed probe uses the complete but process-local JS backend. Tool output reports the selected backend — the fallback is a supported mode, not a silent partial success.
+**Runtime backend.** The package requires Node.js `>=22.13.0` — the floor `pdfjs-dist` sets, and Node 20 reached end of life on 2026-04-30. A persistent retrieval index additionally needs the runtime to provide `node:sqlite` with FTS5 compiled in; when the startup probe finds either missing, the complete but process-local JS backend takes over. Tool output reports the selected backend — the fallback is a supported mode, not a silent partial success.
 
 ## Security and privacy
 

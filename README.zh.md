@@ -33,7 +33,7 @@
 
 ## 从源码安装
 
-需要：带 `web` profile 的 DeepSeek Harness CLI（已验证基线为 npm `@deepseek-ai/dsh@0.1.1-rc.2`）、Node.js `>=20.12.0`、`PATH` 中可用的 `pnpm`。
+需要：带 `web` profile 的 DeepSeek Harness CLI（已验证基线为 npm `@deepseek-ai/dsh@0.1.1-rc.2`）、Node.js `>=22.13.0`、`PATH` 中可用的 `pnpm`。
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -174,7 +174,7 @@ dsh --profile web --dump-config
 
 其余不常用配置项及其权威默认值见 [`src/index.ts`](src/index.ts)。显式配置的 `retrievalIndexDir` 必须是绝对私有路径，且不展开 `~`。
 
-**运行时后端。** 包本身接受 Node.js `>=20.12.0`。持久检索索引还额外要求 Harness 实际 runtime 提供 Node.js `>=22.5.0`、`node:sqlite` 与 FTS5；Node 20 或任何探测失败都会使用功能完整但进程内的 JS 后端。工具输出会报告实际选中的后端——回退是受支持的模式，不是静默的部分成功。
+**运行时后端。** 包要求 Node.js `>=22.13.0`——这是 `pdfjs-dist` 设定的地板，且 Node 20 已于 2026-04-30 结束支持。持久检索索引还额外要求 runtime 提供 `node:sqlite` 且编译了 FTS5；启动探针发现任一缺失时，改用功能完整但进程内的 JS 后端。工具输出会报告实际选中的后端——回退是受支持的模式，不是静默的部分成功。
 
 ## 安全与隐私
 

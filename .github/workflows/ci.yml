@@ -61,24 +61,24 @@ jobs:
 
           test "$missing" = 0
 
-  node20-fallback:
-    name: node20-fallback
+  node-floor:
+    name: node-floor
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Use Node.js 20.12.2
+      - name: Use the oldest supported Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 20.12.2
+          node-version: 22.13.0
       - name: Enable pinned pnpm
         run: corepack enable && corepack prepare pnpm@10.34.5 --activate
       - name: Install without dependency lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Build the published JavaScript with Node 20
+      - name: Build the published JavaScript on the version floor
         run: pnpm build
-      - name: Exercise the Node 20 memory-backend contract
+      - name: Exercise the memory-backend contract on the version floor
         run: pnpm runtime:smoke
 
   release-gate:
@@ -102,7 +102,7 @@ jobs:
   required-ci:
     name: required-ci
     if: always()
-    needs: [dco, node20-fallback, release-gate]
+    needs: [dco, node-floor, release-gate]
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -110,7 +110,7 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           DCO_RESULT: ${{ needs.dco.result }}
-          NODE20_RESULT: ${{ needs.node20-fallback.result }}
+          NODE_FLOOR_RESULT: ${{ needs.node-floor.result }}
           RELEASE_RESULT: ${{ needs.release-gate.result }}
         run: |
           if [ "$EVENT_NAME" = pull_request ]; then
@@ -118,5 +118,5 @@ jobs:
           else
             test "$DCO_RESULT" = skipped
           fi
-          test "$NODE20_RESULT" = success
+          test "$NODE_FLOOR_RESULT" = success
           test "$RELEASE_RESULT" = success
