@@ -6,7 +6,15 @@ node_modules/
 pnpm-workspace.yaml
 benchmark/local/
 benchmark/*.real.json
-# Runtime-only NFD aliases are generated beside the three tracked NFC files.
-# Tracked files remain tracked; this only hides aliases that Git/macOS cannot
-# represent portably across NFC/NFD-sensitive filesystems.
+# Benchmark fixtures are deterministic generator output, not sources. Every
+# entry point that reads them regenerates them first (pretest, and each
+# benchmark:* script), so a fresh clone needs nothing committed here.
+#
+# Three of them used to be tracked, from before this rule existed. Nothing
+# verified that those committed bytes still matched the generator, so they could
+# drift silently while every test passed — the generator is the only source of
+# truth, and it is versioned.
+#
+# This also hides the NFD filename aliases that Git and macOS cannot represent
+# portably across NFC/NFD-sensitive filesystems.
 benchmark/fixtures/generated/*

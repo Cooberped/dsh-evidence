@@ -2,6 +2,7 @@
 
 ## 0.6.0-beta.1（Cooberped 社区发布候选，尚未发布 npm）
 
+- benchmark fixture 全部取消 git 跟踪。五个素材里原本有三个被提交（早于 `.gitignore` 覆盖该目录），后加的 pptx 与中文 PDF 则没有，而忽略规则的注释仍写着「三个已跟踪文件」。一致性只是次要问题：**没有任何检查证明已提交的字节仍与生成器一致**——所有入口都会先重新生成（`pretest` 及各 `benchmark:*` 脚本），所以过期的副本永远不会让任何东西失败。本次改 PDF 元数据恰好改动了那些字节，若未一并提交，仓库里就会留下三个与唯一真相源静默不符的二进制。已实测：全新克隆下 fixture 目录为空，`npm test` 经 pretest 生成 5 个文件，完整 `release:check` 通过；生成器连跑两次逐字节一致。
 - 改名再补一轮：上一轮只覆盖了文档与图，客户端仍整体使用旧标识符。现已改掉 14 个 CSS 类名、`SOURCE_NAME`（`@` 候选来源标记，`showGroupTitle: false` 故用户不可见）、注入样式标签的 `STYLE_TAG` 与 `data-plugin`，以及两个槽位 id。其中 `dsh-files-button` 这个槽位 id 与官方上游插件同名，改掉顺带消除了一处潜在冲突。benchmark PDF 素材的 author/producer/creator 元数据同步更新。已在真实 harness 中启动验证：注入样式标签为 `dsh-evidence`（3927 字节 CSS），`.dsh-evidence-btn` 渲染 2 个，旧类名 0 个。
 - 补完改名：此前只换了仓库 URL 与包名，产品名本身在多处没跟上——三张配图的标题与 wordmark、两个 README 的 H1 与 img alt、CONTRIBUTING/SECURITY/benchmark README/issue 模板，以及源码里的 logger 名、配置错误前缀和注释。其中 `cd dsh-files` 是**真缺陷**：`git clone` 产生的目录叫 `dsh-evidence`，照 README 敲第二步就会失败。配图改的是 `assets/source/content.mjs` 后重新生成，未手改 SVG。
 - 刻意保留三类同名项：`.dsh-filess` 上传目录与 `$DSH_HOME/dsh-files/index` 索引目录持有用户数据，改名会静默孤儿化现有安装；`dsh-files-button` 指的是官方上游插件，不是本项目。索引路径处已加注释说明原因。
