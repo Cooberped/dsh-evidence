@@ -43,7 +43,7 @@ test('pure raster drops stay with the Harness native image pipeline', () => {
   ])), false)
 })
 
-test('document, mixed and directory drops are owned by dsh-files', () => {
+test('document, mixed and directory drops are owned by dsh-evidence', () => {
   assert.equal(shouldOwnDocumentDrop(transfer([file('a.pdf', 'application/pdf')])), true)
   assert.equal(shouldOwnDocumentDrop(transfer([
     file('a.png', 'image/png'),

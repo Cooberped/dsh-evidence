@@ -32,10 +32,10 @@ async function zipBytes(zip) {
 async function makePdf() {
   const pdf = await PDFDocument.create()
   pdf.setTitle('Synthetic Atlas Process Performance Benchmark')
-  pdf.setAuthor('dsh-files benchmark generator')
+  pdf.setAuthor('dsh-evidence benchmark generator')
   pdf.setSubject('Synthetic-only retrieval fixture')
-  pdf.setProducer('dsh-files deterministic fixture')
-  pdf.setCreator('dsh-files deterministic fixture')
+  pdf.setProducer('dsh-evidence deterministic fixture')
+  pdf.setCreator('dsh-evidence deterministic fixture')
   pdf.setCreationDate(FIXED_DATE)
   pdf.setModificationDate(FIXED_DATE)
   const font = await pdf.embedFont(StandardFonts.Helvetica)

@@ -1,4 +1,4 @@
-// dsh-files client face: composer paperclip button + floating file cards.
+// dsh-evidence client face: composer paperclip button + floating file cards.
 // Uploads carry the session id so the host stores files inside that session's
 // workspace (.dsh-filess/<sessionId>), where the agent's fs backend can
 // always resolve them.
@@ -8,8 +8,8 @@ import { Tooltip, IconPaperclipOutline16, IconCloseOutline16, IconFolderOpenOutl
 import { isRepresentableFileRef, modelFileMention } from '../reference.ts'
 import { collectDroppedFiles, hasFileTransfer, isRasterImage, shouldOwnDocumentDrop } from './drop.ts'
 
-const SOURCE_NAME = 'dsh-files'
-const STYLE_TAG = 'dsh-files/style.css'
+const SOURCE_NAME = 'dsh-evidence'
+const STYLE_TAG = 'dsh-evidence/style.css'
 // 文件夹拖入/选中时，逐文件上传的有界并发上限。
 // 服务端 maxConcurrentUploads 默认 4：超过会被 429，这里取同值，
 // 避免整批重试；并发不提升网络吞吐，只消除「串行等待」的排队墙钟时间。
@@ -169,34 +169,34 @@ function injectCss(): void {
   if (typeof document === 'undefined') return
   if (document.querySelector(`style[data-plugin-css=${JSON.stringify(STYLE_TAG)}]`) !== null) return
   const tag = document.createElement('style')
-  tag.dataset.plugin = 'dsh-files'
+  tag.dataset.plugin = 'dsh-evidence'
   tag.dataset.pluginCss = STYLE_TAG
   tag.textContent = `
-.dsh-files-btn{border:none;background:transparent;color:var(--dsw-alias-label-secondary,currentColor);cursor:pointer;border-radius:6px;padding:4px;display:inline-flex;align-items:center;justify-content:center;line-height:0}
-.dsh-files-btn:hover:not(:disabled){color:var(--dsw-alias-label-primary,currentColor)}
-.dsh-files-btn:disabled{opacity:.45;cursor:default}
-.dsh-files-dock{box-sizing:border-box;width:calc(100% - var(--dsh-composer-side-clearance) - var(--dsh-composer-side-clearance) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset));max-width:calc(var(--dsh-composer-card-max-width) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset));margin:0 auto 7px;padding:0 var(--dsh-composer-dock-inset);display:flex;flex-wrap:wrap;gap:7px;flex:none}
-.dsh-files-card{position:relative;box-sizing:border-box;display:flex;align-items:center;gap:9px;width:236px;max-width:100%;min-height:58px;flex:none;overflow:hidden;border:1px solid var(--dsw-alias-border-l2-darkmode-thin,rgba(127,127,127,.22));background:var(--dsw-specific-input-major,var(--dsw-alias-surface-2,rgba(127,127,127,.08)));border-radius:11px;padding:8px 8px 8px 11px;box-shadow:var(--dsw-shadow-lv1,0 1px 2px rgba(0,0,0,.06));color:var(--dsw-alias-label-primary,inherit)}
-.dsh-files-card:before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:#35a568}
-.dsh-files-card--uploading:before{background:#4f7de8;animation:dsh-files-pulse 1.25s ease-in-out infinite}
-.dsh-files-card--error{border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary,#d86161) 45%,transparent)}
-.dsh-files-card--error:before{background:var(--dsw-alias-state-error-primary,#d86161)}
-.dsh-files-badge{width:34px;height:42px;border-radius:6px;color:#fff;font-size:10.5px;font-weight:700;font-family:var(--ds-font-family-code,monospace);display:inline-flex;align-items:center;justify-content:center;letter-spacing:.35px;flex:none;box-shadow:inset 0 -8px 12px rgba(0,0,0,.14),inset 0 8px 10px rgba(255,255,255,.14)}
-.dsh-files-details{min-width:0;display:flex;flex:1;flex-direction:column;gap:3px}
-.dsh-files-name{width:100%;font-size:12.5px;line-height:17px;font-weight:520;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dsh-files-meta{display:flex;align-items:center;gap:6px;min-width:0;color:var(--dsw-alias-label-tertiary,inherit);font-size:10.5px;line-height:14px}
-.dsh-files-status{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dsh-files-status:before{content:'';display:inline-block;width:5px;height:5px;margin:0 5px 1px 0;border-radius:50%;background:#35a568}
-.dsh-files-card--uploading .dsh-files-status:before{background:#4f7de8}
-.dsh-files-card--error .dsh-files-status{color:var(--dsw-alias-state-error-primary,#d86161)}
-.dsh-files-card--error .dsh-files-status:before{background:var(--dsw-alias-state-error-primary,#d86161)}
-.dsh-files-size{white-space:nowrap;flex:none}
-.dsh-files-remove{border:none;background:transparent;color:var(--dsw-alias-label-tertiary,inherit);cursor:pointer;padding:2px;border-radius:4px;display:inline-flex;line-height:0;flex:none}
-.dsh-files-remove:hover{color:var(--dsw-alias-label-primary,inherit);background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}
-.dsh-files-error{display:inline-flex;align-items:center;gap:8px;max-width:100%;border:1px solid var(--dsw-alias-border-l2-darkmode-thin,rgba(127,127,127,.22));background:var(--dsw-alias-interactive-bg-hover-danger,rgba(216,97,97,.14));color:var(--dsw-alias-state-error-primary,#d86161);border-radius:10px;padding:6px 8px 6px 10px;font-size:13px}
-.dsh-files-error-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px}
-@keyframes dsh-files-pulse{0%,100%{opacity:.55}50%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.dsh-files-card--uploading:before{animation:none}}
+.dsh-evidence-btn{border:none;background:transparent;color:var(--dsw-alias-label-secondary,currentColor);cursor:pointer;border-radius:6px;padding:4px;display:inline-flex;align-items:center;justify-content:center;line-height:0}
+.dsh-evidence-btn:hover:not(:disabled){color:var(--dsw-alias-label-primary,currentColor)}
+.dsh-evidence-btn:disabled{opacity:.45;cursor:default}
+.dsh-evidence-dock{box-sizing:border-box;width:calc(100% - var(--dsh-composer-side-clearance) - var(--dsh-composer-side-clearance) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset));max-width:calc(var(--dsh-composer-card-max-width) - var(--dsh-composer-dock-inset) - var(--dsh-composer-dock-inset));margin:0 auto 7px;padding:0 var(--dsh-composer-dock-inset);display:flex;flex-wrap:wrap;gap:7px;flex:none}
+.dsh-evidence-card{position:relative;box-sizing:border-box;display:flex;align-items:center;gap:9px;width:236px;max-width:100%;min-height:58px;flex:none;overflow:hidden;border:1px solid var(--dsw-alias-border-l2-darkmode-thin,rgba(127,127,127,.22));background:var(--dsw-specific-input-major,var(--dsw-alias-surface-2,rgba(127,127,127,.08)));border-radius:11px;padding:8px 8px 8px 11px;box-shadow:var(--dsw-shadow-lv1,0 1px 2px rgba(0,0,0,.06));color:var(--dsw-alias-label-primary,inherit)}
+.dsh-evidence-card:before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:#35a568}
+.dsh-evidence-card--uploading:before{background:#4f7de8;animation:dsh-evidence-pulse 1.25s ease-in-out infinite}
+.dsh-evidence-card--error{border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary,#d86161) 45%,transparent)}
+.dsh-evidence-card--error:before{background:var(--dsw-alias-state-error-primary,#d86161)}
+.dsh-evidence-badge{width:34px;height:42px;border-radius:6px;color:#fff;font-size:10.5px;font-weight:700;font-family:var(--ds-font-family-code,monospace);display:inline-flex;align-items:center;justify-content:center;letter-spacing:.35px;flex:none;box-shadow:inset 0 -8px 12px rgba(0,0,0,.14),inset 0 8px 10px rgba(255,255,255,.14)}
+.dsh-evidence-details{min-width:0;display:flex;flex:1;flex-direction:column;gap:3px}
+.dsh-evidence-name{width:100%;font-size:12.5px;line-height:17px;font-weight:520;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsh-evidence-meta{display:flex;align-items:center;gap:6px;min-width:0;color:var(--dsw-alias-label-tertiary,inherit);font-size:10.5px;line-height:14px}
+.dsh-evidence-status{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dsh-evidence-status:before{content:'';display:inline-block;width:5px;height:5px;margin:0 5px 1px 0;border-radius:50%;background:#35a568}
+.dsh-evidence-card--uploading .dsh-evidence-status:before{background:#4f7de8}
+.dsh-evidence-card--error .dsh-evidence-status{color:var(--dsw-alias-state-error-primary,#d86161)}
+.dsh-evidence-card--error .dsh-evidence-status:before{background:var(--dsw-alias-state-error-primary,#d86161)}
+.dsh-evidence-size{white-space:nowrap;flex:none}
+.dsh-evidence-remove{border:none;background:transparent;color:var(--dsw-alias-label-tertiary,inherit);cursor:pointer;padding:2px;border-radius:4px;display:inline-flex;line-height:0;flex:none}
+.dsh-evidence-remove:hover{color:var(--dsw-alias-label-primary,inherit);background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.12))}
+.dsh-evidence-error{display:inline-flex;align-items:center;gap:8px;max-width:100%;border:1px solid var(--dsw-alias-border-l2-darkmode-thin,rgba(127,127,127,.22));background:var(--dsw-alias-interactive-bg-hover-danger,rgba(216,97,97,.14));color:var(--dsw-alias-state-error-primary,#d86161);border-radius:10px;padding:6px 8px 6px 10px;font-size:13px}
+.dsh-evidence-error-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px}
+@keyframes dsh-evidence-pulse{0%,100%{opacity:.55}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dsh-evidence-card--uploading:before{animation:none}}
 `
   document.head.appendChild(tag)
 }
@@ -506,12 +506,12 @@ function UploadButton({ attach, scope }: UploadButtonProps) {
   return (
     <>
       <Tooltip label={busy ? '上传中…' : '上传文件'} side="top">
-        <button type="button" className="dsh-files-btn" aria-label="上传文件" disabled={busy} onClick={pick}>
+        <button type="button" className="dsh-evidence-btn" aria-label="上传文件" disabled={busy} onClick={pick}>
           <IconPaperclipOutline16 size={14} />
         </button>
       </Tooltip>
       <Tooltip label={busy ? '上传中…' : '上传文件夹'} side="top">
-        <button type="button" className="dsh-files-btn" aria-label="上传文件夹" disabled={busy} onClick={pickDir}>
+        <button type="button" className="dsh-evidence-btn" aria-label="上传文件夹" disabled={busy} onClick={pickDir}>
           <IconFolderOpenOutline16 size={14} />
         </button>
       </Tooltip>
@@ -563,13 +563,13 @@ function UploadDock({ useInput, inputActions }: DockProps) {
   }
 
   return (
-    <div className="dsh-files-dock">
+    <div className="dsh-evidence-dock">
       {error !== null && (
-        <div className="dsh-files-error" role="alert">
-          <span className="dsh-files-error-text" title={error.text}>
+        <div className="dsh-evidence-error" role="alert">
+          <span className="dsh-evidence-error-text" title={error.text}>
             {error.text}
           </span>
-          <button type="button" className="dsh-files-remove" aria-label="关闭错误提示" onClick={clearUploadError}>
+          <button type="button" className="dsh-evidence-remove" aria-label="关闭错误提示" onClick={clearUploadError}>
             <IconCloseOutline16 size={12} />
           </button>
         </div>
@@ -579,22 +579,22 @@ function UploadDock({ useInput, inputActions }: DockProps) {
         const failed = item.status === 'error'
         return (
           <div
-            className={`dsh-files-card dsh-files-card--${item.status}`}
+            className={`dsh-evidence-card dsh-evidence-card--${item.status}`}
             key={item.id}
             role={failed ? 'alert' : 'status'}
           >
-            <span className="dsh-files-badge" style={{ background: bg }}>{ext}</span>
-            <span className="dsh-files-details">
-              <span className="dsh-files-name" title={item.name}>{item.name}</span>
-              <span className="dsh-files-meta">
-                <span className="dsh-files-size">{formatBytes(item.bytes)}</span>
-                <span className="dsh-files-status" title={item.error}>
+            <span className="dsh-evidence-badge" style={{ background: bg }}>{ext}</span>
+            <span className="dsh-evidence-details">
+              <span className="dsh-evidence-name" title={item.name}>{item.name}</span>
+              <span className="dsh-evidence-meta">
+                <span className="dsh-evidence-size">{formatBytes(item.bytes)}</span>
+                <span className="dsh-evidence-status" title={item.error}>
                   {failed ? item.error ?? '上传失败' : '上传中'}
                 </span>
               </span>
             </span>
             {failed && (
-              <button type="button" className="dsh-files-remove" aria-label="关闭上传错误" onClick={() => dismissPending(item.id)}>
+              <button type="button" className="dsh-evidence-remove" aria-label="关闭上传错误" onClick={() => dismissPending(item.id)}>
                 <IconCloseOutline16 size={12} />
               </button>
             )}
@@ -606,23 +606,23 @@ function UploadDock({ useInput, inputActions }: DockProps) {
         const name = meta?.name ?? nameFromPath(occ.ref)
         const { bg, ext } = badgeStyle(name, meta?.sniffed)
         return (
-          <div className="dsh-files-card" key={occ.occurrenceId}>
-            <span className="dsh-files-badge" style={{ background: bg }}>
+          <div className="dsh-evidence-card" key={occ.occurrenceId}>
+            <span className="dsh-evidence-badge" style={{ background: bg }}>
               {ext}
             </span>
-            <span className="dsh-files-details">
-              <span className="dsh-files-name" title={occ.ref}>{name}</span>
-              <span className="dsh-files-meta">
+            <span className="dsh-evidence-details">
+              <span className="dsh-evidence-name" title={occ.ref}>{name}</span>
+              <span className="dsh-evidence-meta">
                 {meta !== undefined && meta.bytes > 0 && (
-                  <span className="dsh-files-size">{formatBytes(meta.bytes)}</span>
+                  <span className="dsh-evidence-size">{formatBytes(meta.bytes)}</span>
                 )}
-                <span className="dsh-files-status">{readyLabel(meta)}</span>
+                <span className="dsh-evidence-status">{readyLabel(meta)}</span>
               </span>
             </span>
             <Tooltip label="移除" side="top">
               <button
                 type="button"
-                className="dsh-files-remove"
+                className="dsh-evidence-remove"
                 aria-label="移除"
                 onClick={() => removeCard(occ.ref, occ.offset, occ.length)}
               >
@@ -704,7 +704,7 @@ export function apply(ctx: {
     ctx.slots.register(
       {
         name: 'conversation.input.left',
-        id: 'dsh-files-button',
+        id: 'dsh-evidence-button',
         order: 0,
         inject: (sessionId: string) => {
           // 捕获当前会话：@ 工作区候选按会话 cwd 索引。
@@ -724,7 +724,7 @@ export function apply(ctx: {
     ctx.slots.register(
       {
         name: 'conversation.input.dock',
-        id: 'dsh-files-dock',
+        id: 'dsh-evidence-dock',
         order: 5
       },
       UploadDock

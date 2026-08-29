@@ -2,6 +2,7 @@
 
 ## 0.6.0-beta.1（Cooberped 社区发布候选，尚未发布 npm）
 
+- 改名再补一轮：上一轮只覆盖了文档与图，客户端仍整体使用旧标识符。现已改掉 14 个 CSS 类名、`SOURCE_NAME`（`@` 候选来源标记，`showGroupTitle: false` 故用户不可见）、注入样式标签的 `STYLE_TAG` 与 `data-plugin`，以及两个槽位 id。其中 `dsh-files-button` 这个槽位 id 与官方上游插件同名，改掉顺带消除了一处潜在冲突。benchmark PDF 素材的 author/producer/creator 元数据同步更新。已在真实 harness 中启动验证：注入样式标签为 `dsh-evidence`（3927 字节 CSS），`.dsh-evidence-btn` 渲染 2 个，旧类名 0 个。
 - 补完改名：此前只换了仓库 URL 与包名，产品名本身在多处没跟上——三张配图的标题与 wordmark、两个 README 的 H1 与 img alt、CONTRIBUTING/SECURITY/benchmark README/issue 模板，以及源码里的 logger 名、配置错误前缀和注释。其中 `cd dsh-files` 是**真缺陷**：`git clone` 产生的目录叫 `dsh-evidence`，照 README 敲第二步就会失败。配图改的是 `assets/source/content.mjs` 后重新生成，未手改 SVG。
 - 刻意保留三类同名项：`.dsh-filess` 上传目录与 `$DSH_HOME/dsh-files/index` 索引目录持有用户数据，改名会静默孤儿化现有安装；`dsh-files-button` 指的是官方上游插件，不是本项目。索引路径处已加注释说明原因。
 - hero 的 wordmark 现在受 `assertFits` 约束。它就是产品名，改名时会变长，而此前没有任何检查覆盖它。
