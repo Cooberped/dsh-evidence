@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "fflate": "0.8.3",
-    "pdfjs-dist": "^6.2.108",
+    "pdfjs-dist": "^6.3.289",
     "read-excel-file": "9.3.10",
     "saxen": "11.1.1"
   },
