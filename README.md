@@ -33,7 +33,7 @@ Files become addressable evidence rather than prompt baggage. That is the whole 
 
 ## Install from source
 
-You need the DeepSeek Harness CLI with the `web` profile (validated baseline: npm `@deepseek-ai/dsh@0.1.1-rc.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
+You need the DeepSeek Harness CLI with the `web` profile (validated baseline: npm `@deepseek-ai/dsh@0.1.7-alpha.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -218,7 +218,7 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | | |
 | --- | --- |
 | Project | Public source beta, independently maintained by Cooberped |
-| Harness baseline | Tested against npm `@deepseek-ai/dsh@0.1.1-rc.2` with the `web` profile |
+| Harness baseline | Tested against npm `@deepseek-ai/dsh@0.1.7-alpha.2` with the `web` profile |
 | Runtime acceptance target | OpenCode Go — DeepSeek V4 Flash |
 | npm | **Not published.** Package metadata targets `@cooberped/dsh-evidence@0.6.0-beta.1`; scope ownership, trusted publishing and the first-release license gate remain open |
 | Compatibility | Newer Harness source trains are not claimed compatible until separately tested |

@@ -33,7 +33,7 @@
 
 ## 从源码安装
 
-需要：带 `web` profile 的 DeepSeek Harness CLI（已验证基线为 npm `@deepseek-ai/dsh@0.1.1-rc.2`）、Node.js `>=22.13.0`、`PATH` 中可用的 `pnpm`。
+需要：带 `web` profile 的 DeepSeek Harness CLI（已验证基线为 npm `@deepseek-ai/dsh@0.1.7-alpha.2`）、Node.js `>=22.13.0`、`PATH` 中可用的 `pnpm`。
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -218,7 +218,7 @@ dsh --profile web --dump-config
 | | |
 | --- | --- |
 | 项目 | 公开源码 Beta，由 Cooberped 独立维护 |
-| Harness 基线 | 已按 npm `@deepseek-ai/dsh@0.1.1-rc.2` 的 `web` profile 验证 |
+| Harness 基线 | 已按 npm `@deepseek-ai/dsh@0.1.7-alpha.2` 的 `web` profile 验证 |
 | 真实环境验收目标模型 | OpenCode Go — DeepSeek V4 Flash |
 | npm | **尚未发布。** 包元数据声明目标为 `@cooberped/dsh-evidence@0.6.0-beta.1`；scope 所有权、trusted publishing 与首次发布许可 Gate 尚未闭合 |
 | 兼容性 | 未经单独验收，不宣称兼容更新的 Harness 源码版本线 |
