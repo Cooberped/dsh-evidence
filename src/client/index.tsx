@@ -4,7 +4,7 @@
 // always resolve them.
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { Tooltip, IconPaperclipOutline16, IconCloseOutline16, IconFolderOpenOutline16 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Tooltip, IconPaperclipOutlineRegular, IconCloseOutlineRegular, IconFolderOpenOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import { isRepresentableFileRef, modelFileMention } from '../reference.ts'
 import { collectDroppedFiles, hasFileTransfer, isRasterImage, shouldOwnDocumentDrop } from './drop.ts'
 
@@ -507,12 +507,12 @@ function UploadButton({ attach, scope }: UploadButtonProps) {
     <>
       <Tooltip label={busy ? '上传中…' : '上传文件'} side="top">
         <button type="button" className="dsh-evidence-btn" aria-label="上传文件" disabled={busy} onClick={pick}>
-          <IconPaperclipOutline16 size={14} />
+          <IconPaperclipOutlineRegular size={14} />
         </button>
       </Tooltip>
       <Tooltip label={busy ? '上传中…' : '上传文件夹'} side="top">
         <button type="button" className="dsh-evidence-btn" aria-label="上传文件夹" disabled={busy} onClick={pickDir}>
-          <IconFolderOpenOutline16 size={14} />
+          <IconFolderOpenOutlineRegular size={14} />
         </button>
       </Tooltip>
     </>
@@ -570,7 +570,7 @@ function UploadDock({ useInput, inputActions }: DockProps) {
             {error.text}
           </span>
           <button type="button" className="dsh-evidence-remove" aria-label="关闭错误提示" onClick={clearUploadError}>
-            <IconCloseOutline16 size={12} />
+            <IconCloseOutlineRegular size={12} />
           </button>
         </div>
       )}
@@ -595,7 +595,7 @@ function UploadDock({ useInput, inputActions }: DockProps) {
             </span>
             {failed && (
               <button type="button" className="dsh-evidence-remove" aria-label="关闭上传错误" onClick={() => dismissPending(item.id)}>
-                <IconCloseOutline16 size={12} />
+                <IconCloseOutlineRegular size={12} />
               </button>
             )}
           </div>
@@ -626,7 +626,7 @@ function UploadDock({ useInput, inputActions }: DockProps) {
                 aria-label="移除"
                 onClick={() => removeCard(occ.ref, occ.offset, occ.length)}
               >
-                <IconCloseOutline16 size={12} />
+                <IconCloseOutlineRegular size={12} />
               </button>
             </Tooltip>
           </div>

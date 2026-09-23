@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- 适配 DeepSeek Harness 0.1.7-alpha.2：`@deepseek-ai/dsh-client-ui-primitives` 在 0.1.7 中把带尺寸后缀的图标改名（`IconPaperclipOutline16` / `IconCloseOutline16` / `IconFolderOpenOutline16` → 按线宽拆成 `…Regular` / `…Medium` 两个变体，本插件与内核主流用法一致选 `IconPaperclipOutlineRegular` / `IconCloseOutlineRegular` / `IconFolderOpenOutlineRegular`，尺寸继续走 `size` 属性；上游 commit `4937343a5e`「unify the client visual language」）。旧名字在 0.1.7 下解析为 `undefined`，`conversation.input.left` 槽位里的上传按钮渲染即抛 React #130，整个输入区左侧按钮组失效。改用新名字，并把 `@deepseek-ai/dsh-*` 的 dev/peer 依赖提到 `0.1.7-alpha.2`（`dsh-client-runtime` 在 npm 上止于 `0.1.1-rc.2`，保持不变）。**注意：改动后不再兼容 0.1.6 及更早的内核**（旧内核没有新名字）。已在真实 0.1.7-alpha.2 harness 中启动验证：上传按钮正常渲染，控制台无 #130。
+
 ## 0.6.0-beta.1（Cooberped 社区发布候选，尚未发布 npm）
 
 - benchmark fixture 全部取消 git 跟踪。五个素材里原本有三个被提交（早于 `.gitignore` 覆盖该目录），后加的 pptx 与中文 PDF 则没有，而忽略规则的注释仍写着「三个已跟踪文件」。一致性只是次要问题：**没有任何检查证明已提交的字节仍与生成器一致**——所有入口都会先重新生成（`pretest` 及各 `benchmark:*` 脚本），所以过期的副本永远不会让任何东西失败。本次改 PDF 元数据恰好改动了那些字节，若未一并提交，仓库里就会留下三个与唯一真相源静默不符的二进制。已实测：全新克隆下 fixture 目录为空，`npm test` 经 pretest 生成 5 个文件，完整 `release:check` 通过；生成器连跑两次逐字节一致。
