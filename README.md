@@ -35,6 +35,8 @@ Files become addressable evidence rather than prompt baggage. That is the whole 
 
 You need the DeepSeek Harness CLI with the `web` profile (validated baseline: npm `@deepseek-ai/dsh@0.1.7-rc.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
 
+**Compatibility floor: DeepSeek Harness ≥ 0.1.7.** This checkout uses the `…Regular` client icon names and pins `@deepseek-ai/dsh-*` peers to `0.1.7-rc.2`. Harness ≤ 0.1.6 breaks the upload icons and that peer contract. This repository has no release tag for an older line; if you still need ≤ 0.1.6, use a checkout from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
+
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
 cd dsh-evidence
@@ -219,11 +221,18 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | --- | --- |
 | Project | Public source beta, independently maintained by Cooberped |
 | Harness baseline | Tested against npm `@deepseek-ai/dsh@0.1.7-rc.2` with the `web` profile |
+| Harness floor | **≥ 0.1.7.** ≤ 0.1.6 breaks upload icons and the peer contract. For an older harness, use an older checkout or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files); no release tag exists for that older line |
 | Runtime acceptance target | OpenCode Go — DeepSeek V4 Flash |
 | npm | **Not published.** Package metadata targets `@cooberped/dsh-evidence@0.6.0-beta.1`; scope ownership, trusted publishing and the first-release license gate remain open |
 | Compatibility | Newer Harness source trains are not claimed compatible until separately tested |
 
-This is **not an official DeepSeek plugin** and is not affiliated with or endorsed by DeepSeek. It is also not a clean-room rewrite: the MIT-licensed history of [taxueseek/dsh-files](https://github.com/taxueseek/dsh-files) is retained, while Cooberped independently develops the retrieval, coordinate, security, performance and release layers described here.
+This is **not an official DeepSeek plugin** and is not affiliated with or endorsed by DeepSeek.
+
+### Relative to dsh-files
+
+This repository retains the MIT-licensed git history of [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files), including attribution and the MIT notice, and is maintained independently (it has left the GitHub fork network). It is not a clean-room rewrite.
+
+Beyond upstream upload and `read_document`, this line adds local private retrieval (`search_documents`), version-checked coordinates, stronger upload/path/OOXML bounds, PPTX text and speaker notes, CJK-aware retrieval, and community release and governance.
 
 ## Development
 
@@ -243,6 +252,8 @@ pnpm release:check   # everything above, for a final candidate
 ## Contributing
 
 Issues and pull requests are welcome. Contributions are **reviewed and merged by maintainers after required checks**; GitHub does not merge community code automatically.
+
+Fixes for Harness UI, peer, or upstream API breakage are especially welcome — the 0.1.7 icon rename to `…Regular` names is one example. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 Before opening a PR: read [`CONTRIBUTING.md`](CONTRIBUTING.md) and sign off commits for DCO; add focused tests for behavior changes; run the smallest relevant checks locally; keep real documents, credentials, private paths and model outputs out of Git; and record every new visual asset in [`assets/README.md`](assets/README.md).
 
