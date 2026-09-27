@@ -35,6 +35,8 @@
 
 需要：带 `web` profile 的 DeepSeek Harness CLI（已验证基线为 npm `@deepseek-ai/dsh@0.1.7-rc.2`）、Node.js `>=22.13.0`、`PATH` 中可用的 `pnpm`。
 
+**兼容地板：DeepSeek Harness ≥ 0.1.7。** 当前 checkout 使用 `…Regular` 客户端图标名，并把 `@deepseek-ai/dsh-*` peer 钉在 `0.1.7-rc.2`。Harness ≤ 0.1.6 会破坏上传图标和这份 peer 合同。本仓库没有为更旧版本线打过 release tag；如果仍需要 ≤ 0.1.6，请使用该改动之前的 checkout，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)。
+
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
 cd dsh-evidence
@@ -219,11 +221,18 @@ dsh --profile web --dump-config
 | --- | --- |
 | 项目 | 公开源码 Beta，由 Cooberped 独立维护 |
 | Harness 基线 | 已按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile 验证 |
+| Harness 地板 | **≥ 0.1.7。** ≤ 0.1.6 会破坏上传图标与 peer 合同。需要更旧的 Harness 时，使用更早的 checkout 或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；这条旧线没有 release tag |
 | 真实环境验收目标模型 | OpenCode Go — DeepSeek V4 Flash |
 | npm | **尚未发布。** 包元数据声明目标为 `@cooberped/dsh-evidence@0.6.0-beta.1`；scope 所有权、trusted publishing 与首次发布许可 Gate 尚未闭合 |
 | 兼容性 | 未经单独验收，不宣称兼容更新的 Harness 源码版本线 |
 
-本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。它也不是 clean-room 重写：仓库保留 MIT 许可的 [taxueseek/dsh-files](https://github.com/taxueseek/dsh-files) 历史；本文所述检索、坐标、安全、性能与发布治理层由 Cooberped 继续独立开发。
+本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。
+
+### 相对 dsh-files
+
+本仓库保留 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files) 的 MIT 许可 Git 历史（含署名与 MIT 声明），并由 Cooberped 独立维护（已离开 GitHub fork 网络）。它不是 clean-room 重写。
+
+在上游的上传与 `read_document` 之上，这条线增加了本地私有检索（`search_documents`）、带版本校验的坐标、更严的上传/路径/OOXML 边界、PPTX 文本与演讲者备注、面向中文语序的检索，以及社区发布与治理。
 
 ## 开发
 
@@ -243,6 +252,8 @@ pnpm release:check   # 以上全部，用于最终候选
 ## 参与贡献
 
 欢迎提交 Issue 和 Pull Request。所有贡献都由**维护者在必需检查通过后人工评审合并**，GitHub 不会自动合并社区代码。
+
+Harness 界面、peer 或上游 API 断裂的修复尤其欢迎——0.1.7 将图标改名为 `…Regular` 即是一例。详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
 
 提 PR 之前：阅读 [`CONTRIBUTING.md`](CONTRIBUTING.md) 并为提交签署 DCO；为行为变更补充聚焦测试；在本地跑最小相关检查；不要把真实文档、凭据、私有路径和模型输出提交到 Git；每一项新增视觉素材都要登记到 [`assets/README.md`](assets/README.md)。
 
