@@ -2,12 +2,19 @@
 
 ## Unreleased
 
-- 内容已确认是文本的上传卡片，徽章字母改跟文件自己的短扩展名（`.md` → `MD`，`.txt` → `TXT`，csv/json/log 等不超过 4 个字符的扩展名同理），不再一律画成灰色 `TXT`。未知或二进制仍是 `FILE`，不信扩展名。PDF/DOC/XLS/PPT 徽章和「AI 可读取」文案不变。
 - npm 包名定为 `@baseland/dsh-evidence`（版本 `0.6.0-beta.1`）。npm 组织 `cooberped` 无法认领，改用维护者的 npm 账号 `baseland`。GitHub 仓库仍是 `Cooberped/dsh-evidence`。
-- 公开 Beta 已发布：npm `@baseland/dsh-evidence@0.6.0-beta.1`，GitHub pre-release `v0.6.0-beta.1`（commit `8bc0418593b4349ab4a6987d33cc86a21399a840`）。`beta` 和 `latest` 目前都指向这一版，因为这是包的第一个版本，npm 不允许删掉唯一的 `latest`。这不是稳定版。安装请用 `@beta`。`main` 上随后的三处上传修正（批量文件的卡片位置、长中文文本识别、文本徽章用自己的短扩展名）还没进这个包。
+- 公开 Beta `0.6.0-beta.1` 已发布：npm `@baseland/dsh-evidence@0.6.0-beta.1`，GitHub pre-release `v0.6.0-beta.1`（commit `8bc0418593b4349ab4a6987d33cc86a21399a840`）。发出时 `beta` 和 `latest` 都指向这一版，因为这是包的第一个版本，npm 不允许删掉唯一的 `latest`。这不是稳定版。安装请用 `@beta`。这一版不包含随后的三处上传修正，见 `0.6.0-beta.2`。
 - 增加手动触发的发布 workflow（`.github/workflows/publish.yml`）。`0.6.0-beta.1` 已用 granular token 发出；以后的版本用 GitHub OIDC，不在仓库里存 `NPM_TOKEN`。workflow 使用 Node.js 24.5.0（自带 npm 11.5.1；更旧的 npm 做 OIDC 会报成 `E404`），默认只打 `beta` 标签，并等待名为 `release` 的环境保护。push 和 tag 都不会发布。这次改动本身不会发布新版本。
 - `THIRD_PARTY_NOTICES.md` 与当前 lockfile 对齐：`saxen` 为 11.2.0，`pdfjs-dist` 为已解析的 6.3.289。该版本于 2026-08-29 发布，包内 `LICENSE_LIBERATION` 已是 Liberation 字体协议（上游 #21750，2026-08-10 合并），不再是 6.2.108 里错配的 OFL-1.1 文本。字体本身仍是 Liberation Sans 1.07.4。
 - 适配 DeepSeek Harness 0.1.7-rc.2：`@deepseek-ai/dsh-client-ui-primitives` 在 0.1.7 中把带尺寸后缀的图标改名（`IconPaperclipOutline16` / `IconCloseOutline16` / `IconFolderOpenOutline16` → 按线宽拆成 `…Regular` / `…Medium` 两个变体，本插件与内核主流用法一致选 `IconPaperclipOutlineRegular` / `IconCloseOutlineRegular` / `IconFolderOpenOutlineRegular`，尺寸继续走 `size` 属性；上游 commit `4937343a5e`「unify the client visual language」）。旧名字在 0.1.7 下解析为 `undefined`，`conversation.input.left` 槽位里的上传按钮渲染即抛 React #130，整个输入区左侧按钮组失效。改用新名字，并把 `@deepseek-ai/dsh-*` 的 dev/peer 依赖钉到 `0.1.7-rc.2`（`dsh-client-runtime` 在 npm 上止于 `0.1.1-rc.2`：devDependency 保持该精确版本，peer 放宽为 `^0.1.1-rc.2`，以免宿主把精确 pin 判成与当前内核不兼容）。**注意：改动后不再兼容 0.1.6 及更早的内核**（旧内核没有新名字）。图标改名已在真实 0.1.7-alpha.2 harness 中启动验证：上传按钮正常渲染，控制台无 #130；peer 现钉在已测试的 `0.1.7-rc.2`。
+
+## 0.6.0-beta.2
+
+- 同一批上传多个文件时，后面的卡片会插到输入框里正确的位置。插入位置以前按剪贴板草稿的长度来算。输入框里每个卡片只占一个检测位置，草稿里却是展开后的 `@路径` 加空格，两套长度从第二个文件开始就对不上，于是后面的 XLS、DOC、PDF 卡片会偏掉。
+- 比较长的中文 `.md`，以及同样用 UTF-8 或 GB18030 写成的文本，在开头一段正好切在半个字上时，仍会被认成文本。嗅探只看文件开头的一段。这一段若在多字节字符中间截断，整份文件会被当成格式未知，卡片显示「格式待确认」。现在会把窗口末尾没写完的字符补齐后再判断；文件本身在半个字上结束的，仍然拒绝。
+- 内容已确认是文本的上传卡片，徽章字母改跟文件自己的短扩展名（`.md` → `MD`，`.txt` → `TXT`，csv/json/log 等不超过 4 个字符的扩展名同理），不再一律画成灰色 `TXT`。未知或二进制仍是 `FILE`，不信扩展名。PDF/DOC/XLS/PPT 徽章和「AI 可读取」文案不变。
+
+这一版仍是预发布。合并版本号不会发布到 npm，也不会创建 GitHub Release。维护者另行执行 `npm publish --tag beta`，并单独创建 GitHub pre-release `v0.6.0-beta.2`。发布之后 `beta` 指向这一版，`latest` 继续留在 `0.6.0-beta.1`。
 
 ## 0.6.0-beta.1（公开 Beta；GitHub pre-release `v0.6.0-beta.1`）
 

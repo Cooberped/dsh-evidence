@@ -15,7 +15,7 @@
 Upload files or a whole folder from the Web composer. Parsing and indexing stay on your machine. The model searches for compact evidence and expands only the exact page, slide, line range or spreadsheet range it needs — instead of pasting whole documents into the prompt or shelling out to Python. Raster images stay on Harness' native vision path.
 
 > [!IMPORTANT]
-> **Public npm beta.** Install [`@baseland/dsh-evidence@beta`](https://www.npmjs.com/package/@baseland/dsh-evidence). The published build is [`0.6.0-beta.1`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1). Prefer `@beta` for this pre-release. `latest` currently points at the same version because npm will not delete the `latest` tag while it is the only version; that is not a stable release.
+> **Public npm beta.** Install [`@baseland/dsh-evidence@beta`](https://www.npmjs.com/package/@baseland/dsh-evidence). The published build is [`0.6.0-beta.2`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.2). Prefer `@beta` for this pre-release. `latest` still names the first published version, `0.6.0-beta.1`, because this prerelease does not move it. That is not a stable release.
 >
 > The GitHub repository stays at [Cooberped/dsh-evidence](https://github.com/Cooberped/dsh-evidence). The npm package is `@baseland/dsh-evidence` because the npm organization `@cooberped` could not be claimed.
 
@@ -47,9 +47,9 @@ dsh --profile web --dump-config     # confirm the bundle layer is present
 dsh web                             # restart
 ```
 
-Prefer `@beta`. It names this pre-release. A bare `@baseland/dsh-evidence` follows `latest`, and `latest` currently names `0.6.0-beta.1` only because this is the first version on npm: the registry keeps a `latest` tag, and it will not let you remove that tag while it is the only version. When a stable version is published, `latest` should move to it. `@beta` keeps tracking the pre-release.
+Prefer `@beta`. It names this pre-release, `0.6.0-beta.2`. A bare `@baseland/dsh-evidence` follows `latest`, which still names `0.6.0-beta.1`. That was the first version on npm. The registry keeps a `latest` tag, and publishing this beta with the `beta` tag does not move it. When a stable version is published, `latest` should move to it. `@beta` keeps tracking the pre-release.
 
-Release notes: [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1). That is the build `@beta` installs today. `main` already has three upload fixes that are not in the package yet: chips for the second and later files in a batch land in the right place, a long Chinese text file is still recognized when the first slice ends in the middle of a character, and a confirmed text card shows its own short extension (`.md` as `MD`) instead of `TXT`. Use the source install below if you need those before the next npm beta.
+Release notes: [v0.6.0-beta.2](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.2). That is the build `@beta` installs. It includes the upload fixes that were not in `0.6.0-beta.1`: chips for the second and later files in a batch land in the right place, a long Chinese text file is still recognized when the first slice ends in the middle of a character, and a confirmed text card shows its own short extension (`.md` as `MD`) instead of `TXT`.
 
 `dsh plugin add` forwards the rest of the command to pnpm inside the profile, which is the install path in the [Harness bundle publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md). If your npm client uses a China mirror (for example npmmirror) and the package is missing, point this one command at the public registry:
 
@@ -233,7 +233,7 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | Currently tested against | npm `@deepseek-ai/dsh@0.1.7-rc.2` with the `web` profile |
 | Minimum version | **0.1.7 or higher.** On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. To run an older Harness, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files). There is no release tag for those older versions |
 | Tested with | OpenCode Go — DeepSeek V4 Flash |
-| npm | **Public beta** [`@baseland/dsh-evidence@0.6.0-beta.1`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.1) ([GitHub pre-release v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)). Install with `@beta`. `latest` points at the same version because npm requires a `latest` tag and will not delete it while this is the only version; that is not a stable release. GitHub remains Cooberped. The npm scope is `baseland` because the organization `@cooberped` could not be claimed |
+| npm | **Public beta** [`@baseland/dsh-evidence@0.6.0-beta.2`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.2) ([GitHub pre-release v0.6.0-beta.2](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.2)). Install with `@beta`. `latest` stays on `0.6.0-beta.1`, the first version npm published; this prerelease does not move it, and that is not a stable release. GitHub remains Cooberped. The npm scope is `baseland` because the organization `@cooberped` could not be claimed |
 | Compatibility | Newer Harness source versions have not been tested separately, so compatibility is not guaranteed yet |
 
 This is **not an official DeepSeek plugin** and is not affiliated with or endorsed by DeepSeek.
