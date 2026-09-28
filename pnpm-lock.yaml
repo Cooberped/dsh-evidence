@@ -18,8 +18,8 @@ importers:
         specifier: 9.3.10
         version: 9.3.10
       saxen:
-        specifier: 11.1.1
-        version: 11.1.1
+        specifier: 11.2.0
+        version: 11.2.0
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: 4.0.4
@@ -1010,8 +1010,8 @@ packages:
   safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
 
-  saxen@11.1.1:
-    resolution: {integrity: sha512-J4BkmJFaM7VgE7pgkFGsNEcqqM3h7+Mz80vfLWFhx7uNOCOXIu6LLjQHYWNejdst3pf/3JUaBIG9+pkk1umlow==}
+  saxen@11.2.0:
+    resolution: {integrity: sha512-2bG564AAJcm/3vyZC0Uhs/mACrH+4AHMaKHKAB2M5xMqomUZa27FQ7MYaQGFKVcJk/MVzSEQ34A8QZWW+eiWEw==}
     engines: {node: '>= 20.12'}
 
   setimmediate@1.0.5:
@@ -2020,7 +2020,7 @@ snapshots:
   read-excel-file@9.3.10:
     dependencies:
       fflate: 0.8.3
-      saxen: 11.1.1
+      saxen: 11.2.0
       unzipper-esm: 0.13.3
       worker-f: 0.1.20
 
@@ -2036,7 +2036,7 @@ snapshots:
 
   safe-buffer@5.1.2: {}
 
-  saxen@11.1.1: {}
+  saxen@11.2.0: {}
 
   setimmediate@1.0.5: {}
 
