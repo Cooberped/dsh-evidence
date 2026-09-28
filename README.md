@@ -234,6 +234,8 @@ This is **not an official DeepSeek plugin** and is not affiliated with or endors
 
 This repository retains the MIT-licensed git history of [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files), including attribution and the MIT notice, and is maintained independently (it has left the GitHub fork network). It is not a clean-room rewrite.
 
+Do not install `dsh-files` and `@baseland/dsh-evidence` in the same profile. Both register the cordis row id `files-toolkit`.
+
 Beyond upstream upload and `read_document`, this repository adds local private retrieval (`search_documents`), version-checked coordinates, stronger upload/path/OOXML bounds, PPTX text and speaker notes, CJK-aware retrieval, and community release and governance.
 
 ## Development

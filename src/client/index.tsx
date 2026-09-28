@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Tooltip, IconPaperclipOutlineRegular, IconCloseOutlineRegular, IconFolderOpenOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import { isRepresentableFileRef, modelFileMention } from '../reference.ts'
 import { collectDroppedFiles, hasFileTransfer, isRasterImage, shouldOwnDocumentDrop } from './drop.ts'
+import { referenceInsertionSpan } from './span.ts'
 
 const SOURCE_NAME = 'dsh-evidence'
 const STYLE_TAG = 'dsh-evidence/style.css'
@@ -31,8 +32,10 @@ interface PendingUpload {
   name: string
   bytes: number
   sessionId: string
-  status: 'uploading' | 'error'
+  status: 'uploading' | 'ready' | 'error'
   error?: string
+  /** Upload succeeded, but the composer chip was not inserted. */
+  hint?: string
 }
 
 const uploadMeta = new Map<string, UploadMeta>()
@@ -66,6 +69,10 @@ function finishPending(id: string): void {
 
 function failPending(id: string, error: string): void {
   publishPending(pendingSnapshot.map((item) => item.id === id ? { ...item, status: 'error', error } : item))
+}
+
+function markPendingReady(id: string, hint: string): void {
+  publishPending(pendingSnapshot.map((item) => item.id === id ? { ...item, status: 'ready', hint } : item))
 }
 
 function dismissPending(id: string): void {
@@ -165,6 +172,12 @@ function readyLabel(meta?: UploadMeta): string {
   return '已就绪'
 }
 
+/** File is already stored; the chip can still be picked with @. */
+function insertMissHint(meta: UploadMeta): string {
+  const ready = readyLabel(meta)
+  return ready.startsWith('AI 可读取') ? `${ready} · 可通过 @ 重新选择` : '已上传，可通过 @ 重新选择'
+}
+
 function injectCss(): void {
   if (typeof document === 'undefined') return
   if (document.querySelector(`style[data-plugin-css=${JSON.stringify(STYLE_TAG)}]`) !== null) return
@@ -202,8 +215,13 @@ function injectCss(): void {
 }
 
 interface InputSnapshot {
+  /** Clipboard projection. Chips expand to clipboardText, so this is longer than detect text. */
   draft: string
   draftRev: number
+  /** Detect projection when the host publishes it. Each chip is one U+FFFC. */
+  detectText?: string
+  /** Detect-projection length. `slash/input-insert-reference` spans must stay within it. */
+  detectLength?: number
   occurrences: Array<{ source: string; ref: string; occurrenceId: number; offset: number; length: number }>
 }
 
@@ -241,6 +259,8 @@ async function insertReference(actx: ActionContext, ref: string, label: string):
   if (conversation === undefined) throw new Error('conversation service unavailable')
   const input = conversation.input.for(actx)
   const state = input.state.getSnapshot()
+  // TokenSpan is detect coordinates (one U+FFFC per chip). draft.length is the
+  // clipboard projection and only matches while the composer is still empty.
   actx.emit('slash/input-insert-reference', {
     reference: {
       source: SOURCE_NAME,
@@ -248,11 +268,7 @@ async function insertReference(actx: ActionContext, ref: string, label: string):
       label,
       clipboardText: modelFileMention(ref)
     },
-    span: {
-      start: state.draft.length,
-      end: state.draft.length,
-      draftRev: state.draftRev
-    }
+    span: referenceInsertionSpan(state)
   })
   const after = input.state.getSnapshot()
   return after.occurrences.some((o) => o.source === SOURCE_NAME && o.ref === ref)
@@ -355,7 +371,9 @@ async function attachFile(actx: ActionContext, file: File, sessionId: string, re
     clearUploadError()
     const inserted = await insertReference(actx, payload.path, name)
     if (!inserted) {
-      failPending(pendingId, '已上传，可通过 @ 重新选择')
+      // The bytes are already in .dsh-filess and the @ pool. A failed chip
+      // insert is a composer hint, not an upload failure.
+      markPendingReady(pendingId, insertMissHint(meta))
       return
     }
     finishPending(pendingId)
@@ -577,9 +595,11 @@ function UploadDock({ useInput, inputActions }: DockProps) {
       {pending.map((item) => {
         const { bg, ext } = badgeStyle(item.name)
         const failed = item.status === 'error'
+        const ready = item.status === 'ready'
+        const statusText = failed ? item.error ?? '上传失败' : ready ? item.hint ?? '已上传，可通过 @ 重新选择' : '上传中'
         return (
           <div
-            className={`dsh-evidence-card dsh-evidence-card--${item.status}`}
+            className={`dsh-evidence-card${failed || item.status === 'uploading' ? ` dsh-evidence-card--${item.status}` : ''}`}
             key={item.id}
             role={failed ? 'alert' : 'status'}
           >
@@ -588,13 +608,18 @@ function UploadDock({ useInput, inputActions }: DockProps) {
               <span className="dsh-evidence-name" title={item.name}>{item.name}</span>
               <span className="dsh-evidence-meta">
                 <span className="dsh-evidence-size">{formatBytes(item.bytes)}</span>
-                <span className="dsh-evidence-status" title={item.error}>
-                  {failed ? item.error ?? '上传失败' : '上传中'}
+                <span className="dsh-evidence-status" title={failed || ready ? statusText : undefined}>
+                  {statusText}
                 </span>
               </span>
             </span>
-            {failed && (
-              <button type="button" className="dsh-evidence-remove" aria-label="关闭上传错误" onClick={() => dismissPending(item.id)}>
+            {(failed || ready) && (
+              <button
+                type="button"
+                className="dsh-evidence-remove"
+                aria-label={failed ? '关闭上传错误' : '关闭提示'}
+                onClick={() => dismissPending(item.id)}
+              >
                 <IconCloseOutlineRegular size={12} />
               </button>
             )}
