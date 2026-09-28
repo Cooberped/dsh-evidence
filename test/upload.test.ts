@@ -726,6 +726,20 @@ test('upload response carries the byte-sniffed format', async () => {
       })
       const t = (await txt.json()) as { sniffedFormat: string | null }
       assert.equal(t.sniffedFormat, 'text')
+      // 超过嗅探窗口的中文 Markdown。窗口切在 3 字节字符中间时仍须报 text，
+      // 客户端据此显示「AI 可读取」，而不是「格式待确认」。
+      const unit = '# 豆包工作伙伴安全说明书\n\n本文说明工作伙伴在处理企业文档时的安全边界，不得外传劳动合同与个人信息。\n'
+      let markdown = ''
+      while (Buffer.byteLength(markdown) < 20_000) markdown += unit
+      const md = await fetch(`${base}/api/upload`, {
+        method: 'POST',
+        headers: { 'x-file-name': encodeURIComponent('豆包工作伙伴安全说明书.md') },
+        body: markdown
+      })
+      assert.equal(md.status, 200)
+      const m = (await md.json()) as { sniffedFormat: string | null; name: string }
+      assert.equal(m.sniffedFormat, 'text')
+      assert.equal(m.name, '豆包工作伙伴安全说明书.md')
     }
   )
 })

@@ -112,6 +112,22 @@ export function zipMemberNames(bytes: Uint8Array): string[] | null {
   return members === null ? null : members.map((member) => member.name)
 }
 
+/** fatal 解码成功时返回可打印比例是否达标；解码失败返回 null。 */
+function gb18030Printable(bytes: Uint8Array, end: number): boolean | null {
+  try {
+    const dec = new TextDecoder('gb18030', { fatal: true }).decode(bytes.subarray(0, end))
+    // 可解但几乎全是控制字符的序列不是文本（防随机字节/压缩数据误判）。
+    let printable = 0
+    for (const ch of dec) {
+      const code = ch.codePointAt(0) ?? 0
+      if (code >= 0x20 && code !== 0x7f) printable++
+    }
+    return printable / Math.max(dec.length, 1) > 0.9
+  } catch {
+    return null
+  }
+}
+
 /** GB18030 可解即视为合法文本（fatal 模式无替换字符）。 */
 function looksLikeGb18030(bytes: Uint8Array): boolean {
   const n = Math.min(bytes.length, SNIFF_BYTES)
@@ -126,18 +142,18 @@ function looksLikeGb18030(bytes: Uint8Array): boolean {
     }
   }
   if (!hasHigh) return false
-  try {
-    const dec = new TextDecoder('gb18030', { fatal: true }).decode(bytes.subarray(0, n))
-    // 可解但几乎全是控制字符的序列不是文本（防随机字节/压缩数据误判）。
-    let printable = 0
-    for (const ch of dec) {
-      const code = ch.codePointAt(0) ?? 0
-      if (code >= 0x20 && code !== 0x7f) printable++
-    }
-    return printable / Math.max(dec.length, 1) > 0.9
-  } catch {
-    return false
+  // GB18030 字符为 1/2/4 字节。嗅探窗口切在字符中间时 fatal 解码会抛，
+  // 即便文件本身合法。仅当文件比窗口更长时丢掉末尾 1–3 字节再试；
+  // 短文件真的在字符中途结束则保持拒绝。解码成功（无论比例）即停，
+  // 避免把窗口中段的非法序列靠裁尾伪装成文本。
+  const maxTrim = bytes.length > n ? 3 : 0
+  for (let trim = 0; trim <= maxTrim; trim++) {
+    const end = n - trim
+    if (end < 4) return false
+    const printable = gb18030Printable(bytes, end)
+    if (printable !== null) return printable
   }
+  return false
 }
 
 /**
@@ -167,20 +183,22 @@ function looksLikeUtf8(bytes: Uint8Array): boolean {
   while (i < n) {
     const b = bytes[i]
     if (b === 0) return false
-    if (b < 0x80) {
-      i += 1
-    } else if ((b & 0xe0) === 0xc0) {
-      if (i + 1 >= n || (bytes[i + 1] & 0xc0) !== 0x80) return false
-      i += 2
-    } else if ((b & 0xf0) === 0xe0) {
-      if (i + 2 >= n || (bytes[i + 1] & 0xc0) !== 0x80 || (bytes[i + 2] & 0xc0) !== 0x80) return false
-      i += 3
-    } else if ((b & 0xf8) === 0xf0) {
-      if (i + 3 >= n || (bytes[i + 1] & 0xc0) !== 0x80 || (bytes[i + 2] & 0xc0) !== 0x80 || (bytes[i + 3] & 0xc0) !== 0x80) return false
-      i += 4
-    } else {
-      return false
+    let width = 1
+    if (b < 0x80) width = 1
+    else if ((b & 0xe0) === 0xc0) width = 2
+    else if ((b & 0xf0) === 0xe0) width = 3
+    else if ((b & 0xf8) === 0xf0) width = 4
+    else return false
+    // 8192 的嗅探窗口经常切在中文（3 字节）中间。窗口内这段不完整、
+    // 但文件后文能补齐且续字节合法时，仍是 UTF-8。只看窗口会把
+    // 超过 8KB 的 .md/.txt 判成未知，上传卡片就落在「格式待确认」。
+    // 文件本身在字符中途结束则拒绝，不把残缺序列当成文本。
+    if (i + width > bytes.length) return false
+    for (let k = 1; k < width; k++) {
+      if ((bytes[i + k] & 0xc0) !== 0x80) return false
     }
+    if (i + width > n) return true
+    i += width
   }
   return true
 }
