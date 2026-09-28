@@ -25,7 +25,7 @@
 4. **只在需要时展开带版本的准确坐标**。
 5. **基于证据回答**；没有证据就明确说明。
 
-文件不再只是 prompt 负担，而成为可寻址、可回读的证据。整个设计就是这一件事。
+这样，文件就变成可以定位、按需回读的证据，而不是整篇塞进 prompt。
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/architecture.zh.svg" width="100%" alt="dsh-evidence 架构：输入框、本地摄取、私有检索、模型工具以及原生视觉分支。">
@@ -33,9 +33,9 @@
 
 ## 从源码安装
 
-需要：带 `web` profile 的 DeepSeek Harness CLI（已验证基线为 npm `@deepseek-ai/dsh@0.1.7-rc.2`）、Node.js `>=22.13.0`、`PATH` 中可用的 `pnpm`。
+需要带 `web` profile 的 DeepSeek Harness CLI（目前按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 测过）、Node.js `>=22.13.0`，以及 `PATH` 中可用的 `pnpm`。
 
-**兼容地板：DeepSeek Harness ≥ 0.1.7。** 当前 checkout 使用 `…Regular` 客户端图标名，并把 `@deepseek-ai/dsh-*` peer 钉在 `0.1.7-rc.2`。Harness ≤ 0.1.6 会破坏上传图标和这份 peer 合同。本仓库没有为更旧版本线打过 release tag；如果仍需要 ≤ 0.1.6，请使用该改动之前的 checkout，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)。
+需要 DeepSeek Harness 0.1.7 或更高。当前代码使用 `…Regular` 图标名，并把 `@deepseek-ai/dsh-*` 的 peer 依赖钉在 `0.1.7-rc.2`。在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。仓库没有为旧版打过 release tag；若仍要跑 ≤ 0.1.6，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)。
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -53,16 +53,16 @@ dsh web                             # 重启
 <details>
 <summary>未来的 npm Beta——目前尚不可用</summary>
 
-只有在仓库发布 Gate 与 npm trusted publishing 全部闭合后，安装方式才会变成：
+等 scope、可信发布和首次发布前的许可证检查都做完，安装方式才会变成：
 
 ```sh
 dsh plugin --profile web add @cooberped/dsh-evidence@beta
 # 重启 dsh web
 ```
 
-这里明确标成**未来命令**，现在执行不会成功。
+这是**以后**才会用的命令，现在执行不会成功。
 
-profile/plugin 合同遵循官方 [Harness 插件参考](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md)和 [bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.zh.md)。
+profile 和插件的用法遵循官方 [Harness 插件参考](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md)和 [bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.zh.md)。
 
 </details>
 
@@ -109,7 +109,7 @@ profile/plugin 合同遵循官方 [Harness 插件参考](https://github.com/deep
 
 ## 支持格式与诚实边界
 
-| 输入 | 本地投影 | 稳定坐标 | 当前边界 |
+| 输入 | 本地转成的文本 | 稳定坐标 | 当前边界 |
 | --- | --- | --- | --- |
 | Text | UTF-8、UTF-16 BOM、高置信度无 BOM UTF-16、GB18030 | `line:S-E`，可附 `chars:S-E` | 其他编码和二进制文件会被拒绝 |
 | PDF | 文本层提取，保留页边界 | `page:N`，可附页内行/字符范围 | 扫描件和纯图片页没有 OCR |
@@ -130,7 +130,7 @@ profile/plugin 合同遵循官方 [Harness 插件参考](https://github.com/deep
 - 文档在 Harness 图片专用 drop handler 之前被接管；纯 JPEG/PNG/WebP/GIF 仍走原生图片链路。
 - 有界并发上传（默认 `4`）；单个文件失败不会取消整批。
 - 按字节嗅探真实格式的文件卡，展示 `上传中` / `AI 可读取` / `失败` 状态。
-- `@` 候选同时包含上传文件**和**工作区文件，对模型只投影工作区相对路径，不暴露宿主机绝对路径。
+- `@` 候选同时包含上传文件**和**工作区文件，对模型只给出工作区相对路径，不暴露宿主机绝对路径。
 - 每会话配额、SHA-256 去重、TTL 清理、安全文件名归一化、文件夹递归清理。
 
 **本地检索**
@@ -176,17 +176,17 @@ dsh --profile web --dump-config
 
 其余不常用配置项及其权威默认值见 [`src/index.ts`](src/index.ts)。显式配置的 `retrievalIndexDir` 必须是绝对私有路径，且不展开 `~`。
 
-**运行时后端。** 包要求 Node.js `>=22.13.0`——这是 `pdfjs-dist` 设定的地板，且 Node 20 已于 2026-04-30 结束支持。持久检索索引还额外要求 runtime 提供 `node:sqlite` 且编译了 FTS5；启动探针发现任一缺失时，改用功能完整但进程内的 JS 后端。工具输出会报告实际选中的后端——回退是受支持的模式，不是静默的部分成功。
+**运行时后端。** 包要求 Node.js `>=22.13.0`，这是 `pdfjs-dist` 的最低版本，且 Node 20 已于 2026-04-30 结束支持。持久检索索引还需要运行时提供 `node:sqlite`，并且编译了 FTS5。启动探针发现缺其中任意一项时，改用功能完整但仅限进程内的 JS 后端。回退是支持的，并写在工具输出里。
 
 ## 安全与隐私
 
-- **以字节为准。** 扩展名只是提示。PDF 头与 OOXML ZIP 成员决定解析器；已知异类二进制和伪装文件会被拒绝。
+- **按文件字节判断格式，不看扩展名。** 扩展名只是提示。PDF 头与 OOXML ZIP 成员决定解析器；已知异类二进制和伪装文件会被拒绝。
 - **有界 OOXML。** 在解析器分配内存前限制 ZIP 成员数量与名称长度、声明 XML 大小、XML 总展开量、工作簿行列以及稀疏 Sheet 维度。
 - **工作区包含性。** 读取走 `ctx.fs`；存在 session cwd 时，目标必须留在当前会话工作区内。
 - **安全上传落盘。** 拒绝预先存在的符号链接与特殊文件；平台支持时使用 exclusive/no-follow 创建；配额与删除保持 fail closed。
 - **默认仅回环。** 上传与工作区端点要求回环 Host 并做同源校验。`trustedHosts` 只用于部署方控制的反向代理。
 
-> `trustedHosts` **不是身份认证。** 当前 Harness WebServer 插件合同不能证明某个 session ID 一定属于调用者。不要把本插件直接暴露成未经认证的公网多租户上传服务；应使用仅回环的自托管方式，或由同时约束 session 访问的认证代理承载。
+> `trustedHosts` **不是身份认证。** 当前 Harness WebServer 的插件约定不能证明某个 session ID 一定属于调用者。不要把本插件直接暴露成未经认证的公网多租户上传服务；应使用仅回环的自托管方式，或由同时约束 session 访问的认证代理承载。
 
 <details>
 <summary><b>数据存在哪里，什么会离开本机</b></summary>
@@ -194,7 +194,7 @@ dsh --profile web --dump-config
 | 存储 | 默认位置 | 内容 | 生命周期 |
 | --- | --- | --- | --- |
 | 上传文件 | `<会话工作区>/.dsh-filess/<storageKey>/` | 上传的原始字节 | 每会话配额、SHA-256 去重、默认 7 天 TTL 清扫 |
-| 检索索引 | `$DSH_HOME/dsh-files/index` | 检索投影、坐标、版本；只有显式开启时才存 query | 私有权限、文档/query TTL；无法持久化时回退 JS 内存 |
+| 检索索引 | `$DSH_HOME/dsh-files/index` | 供检索的索引内容、坐标、版本；只有显式开启时才存 query | 私有权限、文档/query TTL；无法持久化时回退 JS 内存 |
 
 - 解析与索引都发生在 Harness 主机本地；插件自身不会调用任何外部解析服务。
 - 但工具返回的证据**确实会**进入对话，并可能发送给你配置的模型供应商；原生图片附件同样会发送给所选视觉模型供应商。
@@ -206,12 +206,12 @@ dsh --profile web --dump-config
 <summary><b>已知边界</b>——本项目刻意不做的事</summary>
 
 - 扫描版 PDF 和 Office 文件中的内嵌图片不做 OCR。
-- Office 版式被投影为文本与坐标，不做像素级还原。
+- Office 版式会转成文本和坐标，不做像素级还原。
 - XLSX 公式不计算，宏永不执行。
 - PPTX 图表、SmartArt、动画和嵌入对象不做解释。
 - 上传配额锁是进程内的，不是跨进程事务。
 - 纯 Node 没有完整可移植的 dirfd/openat 链，同 UID 恶意进程抢占祖先目录仍属于 OS 隔离边界。
-- 兼容性刻意锁定在已验收的 Harness 预发布版本线，直到更新的 runtime 通过同一套验收流程。
+- 兼容范围限于已经测过的 Harness 版本。更新的版本还没按同样方式测过，暂时不保证兼容。
 
 </details>
 
@@ -220,19 +220,19 @@ dsh --profile web --dump-config
 | | |
 | --- | --- |
 | 项目 | 公开源码 Beta，由 Cooberped 独立维护 |
-| Harness 基线 | 已按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile 验证 |
-| Harness 地板 | **≥ 0.1.7。** ≤ 0.1.6 会破坏上传图标与 peer 合同。需要更旧的 Harness 时，使用更早的 checkout 或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；这条旧线没有 release tag |
-| 真实环境验收目标模型 | OpenCode Go — DeepSeek V4 Flash |
-| npm | **尚未发布。** 包元数据声明目标为 `@cooberped/dsh-evidence@0.6.0-beta.1`；scope 所有权、trusted publishing 与首次发布许可 Gate 尚未闭合 |
-| 兼容性 | 未经单独验收，不宣称兼容更新的 Harness 源码版本线 |
+| 目前测过 | npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile |
+| 最低版本 | **0.1.7 或更高。** 在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。若仍要跑更旧的 Harness，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；仓库没有为旧版打过 release tag |
+| 实测目标模型 | OpenCode Go — DeepSeek V4 Flash |
+| npm | **尚未发布。** 包名已定（`@cooberped/dsh-evidence@0.6.0-beta.1`）；scope、可信发布和首次发布前的许可证检查还没完成 |
+| 兼容性 | 更新的 Harness 源码版本还没单独测过，暂时不保证兼容 |
 
 本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。
 
-### 相对 dsh-files
+### 和 dsh-files 的关系
 
 本仓库保留 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files) 的 MIT 许可 Git 历史（含署名与 MIT 声明），并由 Cooberped 独立维护（已离开 GitHub fork 网络）。它不是 clean-room 重写。
 
-在上游的上传与 `read_document` 之上，这条线增加了本地私有检索（`search_documents`）、带版本校验的坐标、更严的上传/路径/OOXML 边界、PPTX 文本与演讲者备注、面向中文语序的检索，以及社区发布与治理。
+在上游的上传与 `read_document` 之上，本仓库增加了本地私有检索（`search_documents`）、带版本校验的坐标、更严的上传/路径/OOXML 边界、PPTX 文本与演讲者备注、面向中文语序的检索，以及社区发布与治理。
 
 ## 开发
 
@@ -247,7 +247,7 @@ pnpm package:check
 pnpm release:check   # 以上全部，用于最终候选
 ```
 
-`release:check` 覆盖类型检查、两个 bundle、聚焦回归测试、双后端检索正确性、许可策略与 npm tarball 合同。benchmark 使用确定性的合成 PDF/DOCX/XLSX/PPTX 素材——真实业务文档、答案集与模型输出一律留在仓库之外，详见 [`benchmark/README.md`](benchmark/README.md)。
+`release:check` 覆盖类型检查、两个 bundle、聚焦回归测试、双后端检索正确性、许可策略，以及打包与发布要求。benchmark 使用确定性的合成 PDF/DOCX/XLSX/PPTX 素材——真实业务文档、答案集与模型输出一律留在仓库之外，详见 [`benchmark/README.md`](benchmark/README.md)。
 
 ## 参与贡献
 
@@ -257,7 +257,7 @@ Harness 界面、peer 或上游 API 断裂的修复尤其欢迎——0.1.7 将�
 
 提 PR 之前：阅读 [`CONTRIBUTING.md`](CONTRIBUTING.md) 并为提交签署 DCO；为行为变更补充聚焦测试；在本地跑最小相关检查；不要把真实文档、凭据、私有路径和模型输出提交到 Git；每一项新增视觉素材都要登记到 [`assets/README.md`](assets/README.md)。
 
-安全问题按 [`SECURITY.md`](SECURITY.md) 处理。发布归属与来源 Gate 见 [`RELEASING.md`](RELEASING.md)。
+安全问题按 [`SECURITY.md`](SECURITY.md) 处理。发布归属与来源检查见 [`RELEASING.md`](RELEASING.md)。
 
 ## 许可、传承与标识
 
