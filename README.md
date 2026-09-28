@@ -15,7 +15,7 @@
 Upload files or a whole folder from the Web composer. Parsing and indexing stay on your machine. The model searches for compact evidence and expands only the exact page, slide, line range or spreadsheet range it needs — instead of pasting whole documents into the prompt or shelling out to Python. Raster images stay on Harness' native vision path.
 
 > [!IMPORTANT]
-> **Source beta — not published to npm yet.** `@baseland/dsh-evidence@beta` does not exist on npm at this time. Use the [source install](#install-from-source) below.
+> **Public npm beta.** Install [`@baseland/dsh-evidence@beta`](https://www.npmjs.com/package/@baseland/dsh-evidence). The published build is [`0.6.0-beta.1`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1). Prefer `@beta` for this pre-release. `latest` currently points at the same version because npm will not delete the `latest` tag while it is the only version; that is not a stable release.
 >
 > The GitHub repository stays at [Cooberped/dsh-evidence](https://github.com/Cooberped/dsh-evidence). The npm package is `@baseland/dsh-evidence` because the npm organization `@cooberped` could not be claimed.
 
@@ -33,11 +33,35 @@ That way, a file becomes evidence you can locate and read back on demand, instea
   <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/architecture.svg" width="100%" alt="dsh-evidence architecture: composer, local ingest, private retrieval, model tools, and native vision branch.">
 </p>
 
-## Install from source
+## Install
 
-You need the DeepSeek Harness CLI with the `web` profile (currently tested against npm `@deepseek-ai/dsh@0.1.7-rc.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
+You need the DeepSeek Harness CLI with the `web` profile (currently tested against npm `@deepseek-ai/dsh@0.1.7-rc.2`) and Node.js `>=22.13.0`. A source install also needs `pnpm` on `PATH`.
 
 DeepSeek Harness 0.1.7 or higher is required. The current code uses the `…Regular` icon names and pins the `@deepseek-ai/dsh-*` peer dependencies at `0.1.7-rc.2`. On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. This repository has no release tag for the older versions; if you still need to run ≤ 0.1.6, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
+
+### From npm
+
+```sh
+dsh plugin --profile web add @baseland/dsh-evidence@beta
+dsh --profile web --dump-config     # confirm the bundle layer is present
+dsh web                             # restart
+```
+
+Prefer `@beta`. It names this pre-release. A bare `@baseland/dsh-evidence` follows `latest`, and `latest` currently names `0.6.0-beta.1` only because this is the first version on npm: the registry keeps a `latest` tag, and it will not let you remove that tag while it is the only version. When a stable version is published, `latest` should move to it. `@beta` keeps tracking the pre-release.
+
+Release notes: [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1). That is the build `@beta` installs today. `main` already has three upload fixes that are not in the package yet: chips for the second and later files in a batch land in the right place, a long Chinese text file is still recognized when the first slice ends in the middle of a character, and a confirmed text card shows its own short extension (`.md` as `MD`) instead of `TXT`. Use the source install below if you need those before the next npm beta.
+
+`dsh plugin add` forwards the rest of the command to pnpm inside the profile, which is the install path in the [Harness bundle publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md). If your npm client uses a China mirror (for example npmmirror) and the package is missing, point this one command at the public registry:
+
+```sh
+dsh plugin --profile web add @baseland/dsh-evidence@beta --registry https://registry.npmjs.org/
+```
+
+Remove it with `dsh plugin --profile web remove @baseland/dsh-evidence`.
+
+Profile and plugin setup follows the official [Harness plugin reference](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md) and the same publishing guide.
+
+### From source
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -51,22 +75,6 @@ dsh web                             # restart
 ```
 
 The install is a link to this checkout: after pulling updates, re-run `pnpm install --frozen-lockfile && pnpm build` and restart. Remove it with `dsh plugin --profile web remove @baseland/dsh-evidence`.
-
-<details>
-<summary>Future npm beta — not available yet</summary>
-
-Once trusted publishing and the license checks before the first publish are finished, installation becomes:
-
-```sh
-dsh plugin --profile web add @baseland/dsh-evidence@beta
-# restart dsh web
-```
-
-This is a **future** command. It does not work today.
-
-Profile and plugin setup follows the official [Harness plugin reference](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md) and [bundle publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md).
-
-</details>
 
 ## Use it
 
@@ -225,7 +233,7 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | Currently tested against | npm `@deepseek-ai/dsh@0.1.7-rc.2` with the `web` profile |
 | Minimum version | **0.1.7 or higher.** On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. To run an older Harness, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files). There is no release tag for those older versions |
 | Tested with | OpenCode Go — DeepSeek V4 Flash |
-| npm | **Not published.** The install name is `@baseland/dsh-evidence@0.6.0-beta.1`, under the maintainer's npm account `baseland`, because the npm organization `@cooberped` could not be claimed. GitHub remains Cooberped. Trusted publishing and the license checks before the first publish are not finished |
+| npm | **Public beta** [`@baseland/dsh-evidence@0.6.0-beta.1`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.1) ([GitHub pre-release v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)). Install with `@beta`. `latest` points at the same version because npm requires a `latest` tag and will not delete it while this is the only version; that is not a stable release. GitHub remains Cooberped. The npm scope is `baseland` because the organization `@cooberped` could not be claimed |
 | Compatibility | Newer Harness source versions have not been tested separately, so compatibility is not guaranteed yet |
 
 This is **not an official DeepSeek plugin** and is not affiliated with or endorsed by DeepSeek.

@@ -3,11 +3,13 @@
 ## Unreleased
 
 - 内容已确认是文本的上传卡片，徽章字母改跟文件自己的短扩展名（`.md` → `MD`，`.txt` → `TXT`，csv/json/log 等不超过 4 个字符的扩展名同理），不再一律画成灰色 `TXT`。未知或二进制仍是 `FILE`，不信扩展名。PDF/DOC/XLS/PPT 徽章和「AI 可读取」文案不变。
-- npm 包名定为 `@baseland/dsh-evidence`（版本仍是 `0.6.0-beta.1`，dist-tag 仍是 `beta`）。npm 组织 `cooberped` 无法认领，改用维护者的 npm 账号 `baseland`。GitHub 仓库仍是 `Cooberped/dsh-evidence`。尚未发布 npm，也没有打 tag。
+- npm 包名定为 `@baseland/dsh-evidence`（版本 `0.6.0-beta.1`）。npm 组织 `cooberped` 无法认领，改用维护者的 npm 账号 `baseland`。GitHub 仓库仍是 `Cooberped/dsh-evidence`。
+- 公开 Beta 已发布：npm `@baseland/dsh-evidence@0.6.0-beta.1`，GitHub pre-release `v0.6.0-beta.1`（commit `8bc0418593b4349ab4a6987d33cc86a21399a840`）。`beta` 和 `latest` 目前都指向这一版，因为这是包的第一个版本，npm 不允许删掉唯一的 `latest`。这不是稳定版。安装请用 `@beta`。`main` 上随后的三处上传修正（批量文件的卡片位置、长中文文本识别、文本徽章用自己的短扩展名）还没进这个包。
+- 增加手动触发的发布 workflow（`.github/workflows/publish.yml`）。`0.6.0-beta.1` 已用 granular token 发出；以后的版本用 GitHub OIDC，不在仓库里存 `NPM_TOKEN`。workflow 使用 Node.js 24.5.0（自带 npm 11.5.1；更旧的 npm 做 OIDC 会报成 `E404`），默认只打 `beta` 标签，并等待名为 `release` 的环境保护。push 和 tag 都不会发布。这次改动本身不会发布新版本。
 - `THIRD_PARTY_NOTICES.md` 与当前 lockfile 对齐：`saxen` 为 11.2.0，`pdfjs-dist` 为已解析的 6.3.289。该版本于 2026-08-29 发布，包内 `LICENSE_LIBERATION` 已是 Liberation 字体协议（上游 #21750，2026-08-10 合并），不再是 6.2.108 里错配的 OFL-1.1 文本。字体本身仍是 Liberation Sans 1.07.4。
 - 适配 DeepSeek Harness 0.1.7-rc.2：`@deepseek-ai/dsh-client-ui-primitives` 在 0.1.7 中把带尺寸后缀的图标改名（`IconPaperclipOutline16` / `IconCloseOutline16` / `IconFolderOpenOutline16` → 按线宽拆成 `…Regular` / `…Medium` 两个变体，本插件与内核主流用法一致选 `IconPaperclipOutlineRegular` / `IconCloseOutlineRegular` / `IconFolderOpenOutlineRegular`，尺寸继续走 `size` 属性；上游 commit `4937343a5e`「unify the client visual language」）。旧名字在 0.1.7 下解析为 `undefined`，`conversation.input.left` 槽位里的上传按钮渲染即抛 React #130，整个输入区左侧按钮组失效。改用新名字，并把 `@deepseek-ai/dsh-*` 的 dev/peer 依赖钉到 `0.1.7-rc.2`（`dsh-client-runtime` 在 npm 上止于 `0.1.1-rc.2`：devDependency 保持该精确版本，peer 放宽为 `^0.1.1-rc.2`，以免宿主把精确 pin 判成与当前内核不兼容）。**注意：改动后不再兼容 0.1.6 及更早的内核**（旧内核没有新名字）。图标改名已在真实 0.1.7-alpha.2 harness 中启动验证：上传按钮正常渲染，控制台无 #130；peer 现钉在已测试的 `0.1.7-rc.2`。
 
-## 0.6.0-beta.1（Cooberped 社区发布候选，尚未发布 npm）
+## 0.6.0-beta.1（公开 Beta；GitHub pre-release `v0.6.0-beta.1`）
 
 - benchmark fixture 全部取消 git 跟踪。五个素材里原本有三个被提交（早于 `.gitignore` 覆盖该目录），后加的 pptx 与中文 PDF 则没有，而忽略规则的注释仍写着「三个已跟踪文件」。一致性只是次要问题：**没有任何检查证明已提交的字节仍与生成器一致**——所有入口都会先重新生成（`pretest` 及各 `benchmark:*` 脚本），所以过期的副本永远不会让任何东西失败。本次改 PDF 元数据恰好改动了那些字节，若未一并提交，仓库里就会留下三个与唯一真相源静默不符的二进制。已实测：全新克隆下 fixture 目录为空，`npm test` 经 pretest 生成 5 个文件，完整 `release:check` 通过；生成器连跑两次逐字节一致。
 - 改名再补一轮：上一轮只覆盖了文档与图，客户端仍整体使用旧标识符。现已改掉 14 个 CSS 类名、`SOURCE_NAME`（`@` 候选来源标记，`showGroupTitle: false` 故用户不可见）、注入样式标签的 `STYLE_TAG` 与 `data-plugin`，以及两个槽位 id。其中 `dsh-files-button` 这个槽位 id 与官方上游插件同名，改掉顺带消除了一处潜在冲突。benchmark PDF 素材的 author/producer/creator 元数据同步更新。已在真实 harness 中启动验证：注入样式标签为 `dsh-evidence`（3927 字节 CSS），`.dsh-evidence-btn` 渲染 2 个，旧类名 0 个。

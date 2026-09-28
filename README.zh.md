@@ -15,7 +15,7 @@
 在 Web 输入框上传文件或整个文件夹。解析和索引都留在本机。模型先检索紧凑证据，再按需展开准确的页码、幻灯片、行区间或表格范围——而不是把全文塞进 prompt，也不用退回 Python 遍历。栅格图片继续走 Harness 原生视觉链路。
 
 > [!IMPORTANT]
-> **当前是源码 Beta，尚未发布 npm。** npm 上目前不存在 `@baseland/dsh-evidence@beta`，请使用下方[源码安装](#从源码安装)。
+> **npm Beta 已经可以安装。** 公开版本是 [`@baseland/dsh-evidence@0.6.0-beta.1`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)，包页面在 [`@baseland/dsh-evidence`](https://www.npmjs.com/package/@baseland/dsh-evidence)。这一预发布请用 `@beta`。`latest` 目前也指向同一版本，只是因为包里只有这一版时，npm 不允许删掉 `latest`；这不是稳定版承诺。
 >
 > GitHub 仓库仍是 [Cooberped/dsh-evidence](https://github.com/Cooberped/dsh-evidence)。npm 包名是 `@baseland/dsh-evidence`，因为 npm 组织 `@cooberped` 无法认领。
 
@@ -33,11 +33,35 @@
   <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/architecture.zh.svg" width="100%" alt="dsh-evidence 架构：输入框、本地摄取、私有检索、模型工具以及原生视觉分支。">
 </p>
 
-## 从源码安装
+## 安装
 
-需要带 `web` profile 的 DeepSeek Harness CLI（目前按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 测过）、Node.js `>=22.13.0`，以及 `PATH` 中可用的 `pnpm`。
+需要带 `web` profile 的 DeepSeek Harness CLI（目前按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 测过）和 Node.js `>=22.13.0`。从源码安装还需要 `PATH` 里有 `pnpm`。
 
 需要 DeepSeek Harness 0.1.7 或更高。当前代码使用 `…Regular` 图标名，并把 `@deepseek-ai/dsh-*` 的 peer 依赖钉在 `0.1.7-rc.2`。在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。仓库没有为旧版打过 release tag；若仍要跑 ≤ 0.1.6，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)。
+
+### 从 npm 安装
+
+```sh
+dsh plugin --profile web add @baseland/dsh-evidence@beta
+dsh --profile web --dump-config     # 确认组合配置中已有该 bundle layer
+dsh web                             # 重启
+```
+
+请用 `@beta`。这是这次预发布的标签。只写包名会跟着 `latest` 走，而 `latest` 现在指向 `0.6.0-beta.1`，只是因为这是 npm 上的第一个版本：注册表会保留 `latest`，只剩这一个版本时也不能删。以后发出稳定版时，`latest` 应该改到那个版本。`@beta` 仍表示这次预发布。
+
+说明见 [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)。`@beta` 现在装到的就是这一版。`main` 上已经有三处上传修正，还没进这个包：同一批里第二个及之后的文件会把卡片插到正确位置；较长的中文文本在开头一段正好切在半个字上时仍会被认出；已确认是文本的卡片会显示自己的短扩展名（`.md` 显示为 `MD`），而不是一律 `TXT`。若要先用这些修正，请用下面的源码安装。
+
+`dsh plugin add` 会把后面的参数交给 profile 里的 pnpm，这也是 [Harness bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.zh.md)里的安装方式。如果你的 npm 客户端走了国内镜像（例如 npmmirror），而镜像上还没有这个包，就给这一条命令指定官方注册表：
+
+```sh
+dsh plugin --profile web add @baseland/dsh-evidence@beta --registry https://registry.npmjs.org/
+```
+
+卸载用 `dsh plugin --profile web remove @baseland/dsh-evidence`。
+
+profile 和插件的用法遵循官方 [Harness 插件参考](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md)和同一份发布指南。
+
+### 从源码安装
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -51,22 +75,6 @@ dsh web                             # 重启
 ```
 
 本地安装是对当前 checkout 的链接：拉取更新后重新执行 `pnpm install --frozen-lockfile && pnpm build` 并重启。卸载用 `dsh plugin --profile web remove @baseland/dsh-evidence`。
-
-<details>
-<summary>未来的 npm Beta——目前尚不可用</summary>
-
-等可信发布和首次发布前的许可证检查都做完，安装方式才会变成：
-
-```sh
-dsh plugin --profile web add @baseland/dsh-evidence@beta
-# 重启 dsh web
-```
-
-这是**以后**才会用的命令，现在执行不会成功。
-
-profile 和插件的用法遵循官方 [Harness 插件参考](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md)和 [bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.zh.md)。
-
-</details>
 
 ## 怎么用
 
@@ -225,7 +233,7 @@ dsh --profile web --dump-config
 | 目前测过 | npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile |
 | 最低版本 | **0.1.7 或更高。** 在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。若仍要跑更旧的 Harness，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；仓库没有为旧版打过 release tag |
 | 实测目标模型 | OpenCode Go — DeepSeek V4 Flash |
-| npm | **尚未发布。** 安装名是 `@baseland/dsh-evidence@0.6.0-beta.1`，用维护者的 npm 账号 `baseland`，因为 npm 组织 `@cooberped` 无法认领。GitHub 仍是 Cooberped。可信发布和首次发布前的许可证检查还没完成 |
+| npm | **公开 Beta** [`@baseland/dsh-evidence@0.6.0-beta.1`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.1)（[GitHub pre-release v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)）。请用 `@beta` 安装。`latest` 也指向这一版，因为 npm 要求保留 `latest`，而包里只有这一个版本时不能删掉它；这不是稳定版。GitHub 仍是 Cooberped。包在维护者的 npm 账号 `baseland` 下，因为组织 `@cooberped` 无法认领 |
 | 兼容性 | 更新的 Harness 源码版本还没单独测过，暂时不保证兼容 |
 
 本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。
