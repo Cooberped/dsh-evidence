@@ -234,6 +234,8 @@ dsh --profile web --dump-config
 
 本仓库保留 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files) 的 MIT 许可 Git 历史（含署名与 MIT 声明），并由 Cooberped 独立维护（已离开 GitHub fork 网络）。它不是 clean-room 重写。
 
+不要在同一个 profile 里同时安装 `dsh-files` 和 `@baseland/dsh-evidence`。两者注册的 cordis 行 id 都是 `files-toolkit`。
+
 在上游的上传与 `read_document` 之上，本仓库增加了本地私有检索（`search_documents`）、带版本校验的坐标、更严的上传/路径/OOXML 边界、PPTX 文本与演讲者备注、面向中文语序的检索，以及社区发布与治理。
 
 ## 开发

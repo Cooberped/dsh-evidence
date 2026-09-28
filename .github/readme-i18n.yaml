@@ -5,5 +5,5 @@
 # Kept outside the repository root because npm force-includes README* into the
 # published tarball regardless of the package.json "files" allowlist, and this
 # is a development-only record that users have no reason to install.
-README.md: 442fb374ce7f8bd279e65d95243e1a62dd5f7381
-README.zh.md: 721a8c8955ebeda7c2c0c569c32bb48ec20ed5f8
+README.md: 517c42e711390a7c98cd70b87152bb46078a2382
+README.zh.md: c04dc13b0027aad9451b15602c7dbcff0e650914
