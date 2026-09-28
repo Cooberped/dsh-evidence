@@ -25,7 +25,7 @@ Upload files or a whole folder from the Web composer. Parsing and indexing stay 
 4. **Expand a versioned coordinate** only when more context is needed.
 5. **Answer from evidence**, or say the evidence was not found.
 
-Files become addressable evidence rather than prompt baggage. That is the whole design.
+That way, a file becomes evidence you can locate and read back on demand, instead of pasting the whole document into the prompt.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Cooberped/dsh-evidence/main/assets/readme/architecture.svg" width="100%" alt="dsh-evidence architecture: composer, local ingest, private retrieval, model tools, and native vision branch.">
@@ -33,9 +33,9 @@ Files become addressable evidence rather than prompt baggage. That is the whole 
 
 ## Install from source
 
-You need the DeepSeek Harness CLI with the `web` profile (validated baseline: npm `@deepseek-ai/dsh@0.1.7-rc.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
+You need the DeepSeek Harness CLI with the `web` profile (currently tested against npm `@deepseek-ai/dsh@0.1.7-rc.2`), Node.js `>=22.13.0`, and `pnpm` on `PATH`.
 
-**Compatibility floor: DeepSeek Harness ≥ 0.1.7.** This checkout uses the `…Regular` client icon names and pins `@deepseek-ai/dsh-*` peers to `0.1.7-rc.2`. Harness ≤ 0.1.6 breaks the upload icons and that peer contract. This repository has no release tag for an older line; if you still need ≤ 0.1.6, use a checkout from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
+DeepSeek Harness 0.1.7 or higher is required. The current code uses the `…Regular` icon names and pins the `@deepseek-ai/dsh-*` peer dependencies at `0.1.7-rc.2`. On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. This repository has no release tag for the older versions; if you still need to run ≤ 0.1.6, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
 
 ```sh
 git clone https://github.com/Cooberped/dsh-evidence.git
@@ -53,16 +53,16 @@ The install is a link to this checkout: after pulling updates, re-run `pnpm inst
 <details>
 <summary>Future npm beta — not available yet</summary>
 
-Once the repository release gates and npm trusted publishing are complete, installation becomes:
+Once scope, trusted publishing, and the license checks before the first publish are finished, installation becomes:
 
 ```sh
 dsh plugin --profile web add @cooberped/dsh-evidence@beta
 # restart dsh web
 ```
 
-This is documented as a **future** command. It does not work today.
+This is a **future** command. It does not work today.
 
-The profile/plugin contract follows the official [Harness plugin reference](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md) and [bundle publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md).
+Profile and plugin setup follows the official [Harness plugin reference](https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/reference/README.md) and [bundle publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md).
 
 </details>
 
@@ -109,7 +109,7 @@ Two rules hold the loop together:
 
 ## Formats and honest boundaries
 
-| Input | Local projection | Stable coordinate | Current boundary |
+| Input | Text extracted locally | Stable coordinate | Current boundary |
 | --- | --- | --- | --- |
 | Text | UTF-8, UTF-16 BOM, high-confidence BOM-less UTF-16, GB18030 | `line:S-E`, optional `chars:S-E` | Other encodings and binary files are rejected |
 | PDF | Text-layer extraction, page-preserving | `page:N`, optional local line/character range | No OCR for scanned or image-only pages |
@@ -130,7 +130,7 @@ The format is decided from the bytes, never the extension — an executable rena
 - Documents are captured before Harness' image-only drop handler; pure JPEG/PNG/WebP/GIF drops stay on the native image path.
 - Bounded parallel uploads (default `4`); one failure does not cancel the batch.
 - Byte-sniffed file cards with `uploading` / `AI-readable` / `failed` states.
-- `@` candidates cover uploaded *and* workspace files, projected as workspace-relative paths rather than host absolute paths.
+- `@` candidates cover uploaded *and* workspace files, and are shown as workspace-relative paths rather than host absolute paths.
 - Per-session quota, SHA-256 dedup, TTL cleanup, safe file-name normalization, recursive folder cleanup.
 
 **Local retrieval**
@@ -176,17 +176,17 @@ dsh --profile web --dump-config
 
 Less common settings and their authoritative defaults live in [`src/index.ts`](src/index.ts). An explicit `retrievalIndexDir` must be an absolute private path; `~` is not expanded.
 
-**Runtime backend.** The package requires Node.js `>=22.13.0` — the floor `pdfjs-dist` sets, and Node 20 reached end of life on 2026-04-30. A persistent retrieval index additionally needs the runtime to provide `node:sqlite` with FTS5 compiled in; when the startup probe finds either missing, the complete but process-local JS backend takes over. Tool output reports the selected backend — the fallback is a supported mode, not a silent partial success.
+**Runtime backend.** The package requires Node.js `>=22.13.0` (what `pdfjs-dist` requires), and Node 20 reached end of life on 2026-04-30. A persistent retrieval index also needs the runtime to provide `node:sqlite` with FTS5 compiled in. When the startup probe finds either missing, the complete but process-local JS backend takes over. The fallback is supported and reported in tool output.
 
 ## Security and privacy
 
-- **Byte-level truth.** Extensions are hints only. PDF headers and OOXML ZIP members decide the parser; known foreign binaries and spoofed files are rejected.
+- **Format from file bytes, not the extension.** Extensions are hints only. PDF headers and OOXML ZIP members decide the parser; known foreign binaries and spoofed files are rejected.
 - **Bounded OOXML.** ZIP member count and name length, declared XML sizes, aggregate XML expansion, workbook rows/cells and sparse-sheet dimensions are all capped before parser allocation.
 - **Workspace containment.** Reads go through `ctx.fs`; when a session cwd exists, the target must stay inside the active session workspace.
 - **Safe upload storage.** Pre-existing symlinks and special files are rejected; creation uses exclusive/no-follow flags where supported; quotas and deletion fail closed.
 - **Loopback by default.** Upload and workspace endpoints require a loopback host and same-origin checks. `trustedHosts` exists only for a deployment-controlled reverse proxy.
 
-> `trustedHosts` is **not authentication.** The current Harness WebServer plugin contract cannot prove that a supplied session ID belongs to the caller. Do not expose this plugin as an unauthenticated public multi-tenant upload service. Use loopback-only self-hosting, or an authenticated proxy that also constrains session access.
+> `trustedHosts` is **not authentication.** The current Harness WebServer plugin conventions cannot prove that a supplied session ID belongs to the caller. Do not expose this plugin as an unauthenticated public multi-tenant upload service. Use loopback-only self-hosting, or an authenticated proxy that also constrains session access.
 
 <details>
 <summary><b>Where data lives, and what leaves the machine</b></summary>
@@ -194,7 +194,7 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | Store | Default | Contains | Lifecycle |
 | --- | --- | --- | --- |
 | Uploads | `<session-workspace>/.dsh-filess/<storageKey>/` | Uploaded file bytes | Per-session quota, SHA-256 dedup, default 7-day TTL sweep |
-| Retrieval index | `$DSH_HOME/dsh-files/index` | Search projection, coordinates, versions; queries only when explicitly enabled | Private permissions, document/query TTL, JS memory fallback when persistence is unavailable |
+| Retrieval index | `$DSH_HOME/dsh-files/index` | Index contents for search, coordinates, versions; queries only when explicitly enabled | Private permissions, document/query TTL, JS memory fallback when persistence is unavailable |
 
 - Parsing and indexing are local to the Harness host; the plugin makes no external parsing request of its own.
 - The evidence a tool returns **does** enter the conversation and may be sent to your configured model provider. Native image attachments are also sent to the selected vision provider.
@@ -206,12 +206,12 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 <summary><b>Known limits</b> — what this deliberately does not do</summary>
 
 - Scanned PDFs and images embedded in office files are not OCR'd.
-- Office layout is projected into text and coordinates, not rendered pixel-for-pixel.
+- Office layout is turned into text and coordinates, not rendered pixel-for-pixel.
 - XLSX formulas are not calculated and macros never execute.
 - PPTX charts, SmartArt, animations and embedded objects are not interpreted.
 - Upload quota locking is process-local, not a cross-process transaction.
 - Portable Node exposes no complete dirfd/openat chain, so a hostile same-UID process racing ancestor replacement remains an OS-isolation boundary.
-- Compatibility is pinned to the tested Harness prerelease train until a newer runtime passes the same acceptance workflow.
+- Only Harness versions that have already been tested are covered. A newer version is not guaranteed until it is tested the same way.
 
 </details>
 
@@ -220,19 +220,19 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | | |
 | --- | --- |
 | Project | Public source beta, independently maintained by Cooberped |
-| Harness baseline | Tested against npm `@deepseek-ai/dsh@0.1.7-rc.2` with the `web` profile |
-| Harness floor | **≥ 0.1.7.** ≤ 0.1.6 breaks upload icons and the peer contract. For an older harness, use an older checkout or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files); no release tag exists for that older line |
-| Runtime acceptance target | OpenCode Go — DeepSeek V4 Flash |
-| npm | **Not published.** Package metadata targets `@cooberped/dsh-evidence@0.6.0-beta.1`; scope ownership, trusted publishing and the first-release license gate remain open |
-| Compatibility | Newer Harness source trains are not claimed compatible until separately tested |
+| Currently tested against | npm `@deepseek-ai/dsh@0.1.7-rc.2` with the `web` profile |
+| Minimum version | **0.1.7 or higher.** On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. To run an older Harness, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files). There is no release tag for those older versions |
+| Tested with | OpenCode Go — DeepSeek V4 Flash |
+| npm | **Not published.** The package name is set (`@cooberped/dsh-evidence@0.6.0-beta.1`); scope, trusted publishing, and the license checks before the first publish are not finished |
+| Compatibility | Newer Harness source versions have not been tested separately, so compatibility is not guaranteed yet |
 
 This is **not an official DeepSeek plugin** and is not affiliated with or endorsed by DeepSeek.
 
-### Relative to dsh-files
+### Relationship to dsh-files
 
 This repository retains the MIT-licensed git history of [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files), including attribution and the MIT notice, and is maintained independently (it has left the GitHub fork network). It is not a clean-room rewrite.
 
-Beyond upstream upload and `read_document`, this line adds local private retrieval (`search_documents`), version-checked coordinates, stronger upload/path/OOXML bounds, PPTX text and speaker notes, CJK-aware retrieval, and community release and governance.
+Beyond upstream upload and `read_document`, this repository adds local private retrieval (`search_documents`), version-checked coordinates, stronger upload/path/OOXML bounds, PPTX text and speaker notes, CJK-aware retrieval, and community release and governance.
 
 ## Development
 
@@ -247,7 +247,7 @@ pnpm package:check
 pnpm release:check   # everything above, for a final candidate
 ```
 
-`release:check` covers type checking, both bundles, focused regression tests, dual-backend retrieval correctness, license policy and the npm tarball contract. The benchmark uses deterministic synthetic PDF/DOCX/XLSX/PPTX fixtures — real business documents, answer sets and model outputs stay outside the repository (see [`benchmark/README.md`](benchmark/README.md)).
+`release:check` covers type checking, both bundles, focused regression tests, dual-backend retrieval correctness, license policy, and the package publish requirements. The benchmark uses deterministic synthetic PDF/DOCX/XLSX/PPTX fixtures — real business documents, answer sets and model outputs stay outside the repository (see [`benchmark/README.md`](benchmark/README.md)).
 
 ## Contributing
 
@@ -257,7 +257,7 @@ Fixes for Harness UI, peer, or upstream API breakage are especially welcome — 
 
 Before opening a PR: read [`CONTRIBUTING.md`](CONTRIBUTING.md) and sign off commits for DCO; add focused tests for behavior changes; run the smallest relevant checks locally; keep real documents, credentials, private paths and model outputs out of Git; and record every new visual asset in [`assets/README.md`](assets/README.md).
 
-Security reports follow [`SECURITY.md`](SECURITY.md). Release ownership and provenance gates are in [`RELEASING.md`](RELEASING.md).
+Security reports follow [`SECURITY.md`](SECURITY.md). Release ownership and provenance checks are described in [`RELEASING.md`](RELEASING.md).
 
 ## License, lineage and marks
 
