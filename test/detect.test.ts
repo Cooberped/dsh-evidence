@@ -3,7 +3,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import JSZip from 'jszip'
-import { sniffFormat, zipMemberNames, zipMembers, formatFromExtension, SUPPORTED_FORMATS } from '../src/detect.ts'
+import { sniffFormat, sniffHead, zipMemberNames, zipMembers, formatFromExtension, SUPPORTED_FORMATS } from '../src/detect.ts'
+import { decodeText } from '../src/parse/text.ts'
 
 async function makeZip(files: Record<string, string>): Promise<Uint8Array> {
   const zip = new JSZip()
@@ -149,4 +150,60 @@ test('utf-16 without BOM is detected as text', () => {
   // UTF-16BE 无 BOM：00 68 00 69
   const be = new Uint8Array([0x00, 0x68, 0x00, 0x69])
   assert.equal(sniffFormat(be), 'text')
+})
+
+/** Repeat a Chinese markdown unit past the 8192-byte sniff window. */
+function chineseMarkdown(minBytes: number): Uint8Array {
+  const unit = '# 豆包工作伙伴安全说明书\n\n本文说明工作伙伴在处理企业文档时的安全边界，不得外传劳动合同与个人信息。\n'
+  let text = ''
+  const encode = new TextEncoder()
+  while (encode.encode(text).length < minBytes) text += unit
+  return encode.encode(text)
+}
+
+test('markdown longer than the sniff window stays text at every alignment', () => {
+  // 中文 UTF-8 是 3 字节。8192 窗口经常切在字符中间；只检查窗口会把
+  // 合法 .md 判成 null，上传卡片因此显示「格式待确认」。
+  const body = chineseMarkdown(20_000)
+  assert.ok(body.length > 8192)
+  for (let pad = 0; pad < 6; pad++) {
+    const bytes = new Uint8Array(pad + body.length)
+    bytes.fill(0x61, 0, pad)
+    bytes.set(body, pad)
+    assert.equal(sniffFormat(bytes), 'text', `pad ${pad}`)
+    assert.equal(sniffHead(bytes), 'text', `head pad ${pad}`)
+  }
+  const bom = new Uint8Array(3 + body.length)
+  bom[0] = 0xef
+  bom[1] = 0xbb
+  bom[2] = 0xbf
+  bom.set(body, 3)
+  assert.equal(sniffFormat(bom), 'text')
+  assert.equal(decodeText(bom)?.includes('豆包工作伙伴安全说明书'), true)
+})
+
+test('gb18030 text longer than the sniff window stays text when a character is split', () => {
+  // 「中」的 GBK 编码是 D6 D0。奇数偏移会让 8192 窗口停在双字节中间。
+  const pairs = 5000
+  for (const lead of [0, 1]) {
+    const bytes = new Uint8Array(lead + pairs * 2)
+    bytes.fill(0x61, 0, lead)
+    for (let i = 0; i < pairs; i++) {
+      const offset = lead + i * 2
+      bytes[offset] = 0xd6
+      bytes[offset + 1] = 0xd0
+    }
+    assert.equal(sniffFormat(bytes), 'text', `lead ${lead}`)
+    assert.equal(sniffHead(bytes), 'text', `head lead ${lead}`)
+  }
+})
+
+test('a sniff window does not turn trailing binary into text', () => {
+  const bytes = new Uint8Array(9000)
+  bytes.fill(0xff)
+  assert.equal(sniffFormat(bytes), null)
+  assert.equal(sniffHead(bytes), null)
+  // 文件本身在 UTF-8 字符中途结束，不能靠“窗口之后还有字节”这条规则放行。
+  const truncated = new Uint8Array([0xe4, 0xbd])
+  assert.equal(sniffFormat(truncated), null)
 })
