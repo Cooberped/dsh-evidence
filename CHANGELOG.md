@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 内容已确认是文本的上传卡片，徽章字母改跟文件自己的短扩展名（`.md` → `MD`，`.txt` → `TXT`，csv/json/log 等不超过 4 个字符的扩展名同理），不再一律画成灰色 `TXT`。未知或二进制仍是 `FILE`，不信扩展名。PDF/DOC/XLS/PPT 徽章和「AI 可读取」文案不变。
 - npm 包名定为 `@baseland/dsh-evidence`（版本仍是 `0.6.0-beta.1`，dist-tag 仍是 `beta`）。npm 组织 `cooberped` 无法认领，改用维护者的 npm 账号 `baseland`。GitHub 仓库仍是 `Cooberped/dsh-evidence`。尚未发布 npm，也没有打 tag。
 - `THIRD_PARTY_NOTICES.md` 与当前 lockfile 对齐：`saxen` 为 11.2.0，`pdfjs-dist` 为已解析的 6.3.289。该版本于 2026-08-29 发布，包内 `LICENSE_LIBERATION` 已是 Liberation 字体协议（上游 #21750，2026-08-10 合并），不再是 6.2.108 里错配的 OFL-1.1 文本。字体本身仍是 Liberation Sans 1.07.4。
 - 适配 DeepSeek Harness 0.1.7-rc.2：`@deepseek-ai/dsh-client-ui-primitives` 在 0.1.7 中把带尺寸后缀的图标改名（`IconPaperclipOutline16` / `IconCloseOutline16` / `IconFolderOpenOutline16` → 按线宽拆成 `…Regular` / `…Medium` 两个变体，本插件与内核主流用法一致选 `IconPaperclipOutlineRegular` / `IconCloseOutlineRegular` / `IconFolderOpenOutlineRegular`，尺寸继续走 `size` 属性；上游 commit `4937343a5e`「unify the client visual language」）。旧名字在 0.1.7 下解析为 `undefined`，`conversation.input.left` 槽位里的上传按钮渲染即抛 React #130，整个输入区左侧按钮组失效。改用新名字，并把 `@deepseek-ai/dsh-*` 的 dev/peer 依赖钉到 `0.1.7-rc.2`（`dsh-client-runtime` 在 npm 上止于 `0.1.1-rc.2`：devDependency 保持该精确版本，peer 放宽为 `^0.1.1-rc.2`，以免宿主把精确 pin 判成与当前内核不兼容）。**注意：改动后不再兼容 0.1.6 及更早的内核**（旧内核没有新名字）。图标改名已在真实 0.1.7-alpha.2 harness 中启动验证：上传按钮正常渲染，控制台无 #130；peer 现钉在已测试的 `0.1.7-rc.2`。
