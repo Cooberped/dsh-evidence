@@ -1,5 +1,5 @@
 {
-  "name": "@cooberped/dsh-evidence",
+  "name": "@baseland/dsh-evidence",
   "version": "0.6.0-beta.1",
   "description": "Independent community DeepSeek Harness plugin for secure multi-file upload, native images, local document retrieval, and coordinate-aware text/PDF/DOCX/XLSX/PPTX reading.",
   "keywords": [

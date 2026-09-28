@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
-if (pkg.name !== '@cooberped/dsh-evidence') throw new Error(`unexpected package name: ${pkg.name}`)
+if (pkg.name !== '@baseland/dsh-evidence') throw new Error(`unexpected package name: ${pkg.name}`)
 if (!/^0\.6\.0-beta\.\d+$/.test(pkg.version)) throw new Error(`unexpected beta version: ${pkg.version}`)
 if (pkg.publishConfig?.registry !== 'https://registry.npmjs.org/') throw new Error('official npm registry is not pinned')
 if (pkg.publishConfig?.access !== 'public') throw new Error('scoped package must publish with public access')
@@ -46,7 +46,7 @@ if (artifact.unpackedSize > 1024 * 1024) {
 if (artifact.bundled?.length) throw new Error(`bundled dependencies are not allowed: ${artifact.bundled.join(', ')}`)
 
 const client = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
-if (!client.includes('id: "@cooberped/dsh-evidence"')) {
+if (!client.includes('id: "@baseland/dsh-evidence"')) {
   throw new Error('client bundle was not rebuilt with the scoped ModuleLoader id')
 }
 

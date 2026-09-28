@@ -15,7 +15,9 @@
 在 Web 输入框上传文件或整个文件夹。解析和索引都留在本机。模型先检索紧凑证据，再按需展开准确的页码、幻灯片、行区间或表格范围——而不是把全文塞进 prompt，也不用退回 Python 遍历。栅格图片继续走 Harness 原生视觉链路。
 
 > [!IMPORTANT]
-> **当前是源码 Beta，尚未发布 npm。** npm 上目前不存在 `@cooberped/dsh-evidence@beta`，请使用下方[源码安装](#从源码安装)。
+> **当前是源码 Beta，尚未发布 npm。** npm 上目前不存在 `@baseland/dsh-evidence@beta`，请使用下方[源码安装](#从源码安装)。
+>
+> GitHub 仓库仍是 [Cooberped/dsh-evidence](https://github.com/Cooberped/dsh-evidence)。npm 包名是 `@baseland/dsh-evidence`，因为 npm 组织 `@cooberped` 无法认领。
 
 ## 它怎么工作
 
@@ -48,15 +50,15 @@ dsh --profile web --dump-config     # 确认组合配置中已有该 bundle laye
 dsh web                             # 重启
 ```
 
-本地安装是对当前 checkout 的链接：拉取更新后重新执行 `pnpm install --frozen-lockfile && pnpm build` 并重启。卸载用 `dsh plugin --profile web remove @cooberped/dsh-evidence`。
+本地安装是对当前 checkout 的链接：拉取更新后重新执行 `pnpm install --frozen-lockfile && pnpm build` 并重启。卸载用 `dsh plugin --profile web remove @baseland/dsh-evidence`。
 
 <details>
 <summary>未来的 npm Beta——目前尚不可用</summary>
 
-等 scope、可信发布和首次发布前的许可证检查都做完，安装方式才会变成：
+等可信发布和首次发布前的许可证检查都做完，安装方式才会变成：
 
 ```sh
-dsh plugin --profile web add @cooberped/dsh-evidence@beta
+dsh plugin --profile web add @baseland/dsh-evidence@beta
 # 重启 dsh web
 ```
 
@@ -223,7 +225,7 @@ dsh --profile web --dump-config
 | 目前测过 | npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile |
 | 最低版本 | **0.1.7 或更高。** 在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。若仍要跑更旧的 Harness，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；仓库没有为旧版打过 release tag |
 | 实测目标模型 | OpenCode Go — DeepSeek V4 Flash |
-| npm | **尚未发布。** 包名已定（`@cooberped/dsh-evidence@0.6.0-beta.1`）；scope、可信发布和首次发布前的许可证检查还没完成 |
+| npm | **尚未发布。** 安装名是 `@baseland/dsh-evidence@0.6.0-beta.1`，用维护者的 npm 账号 `baseland`，因为 npm 组织 `@cooberped` 无法认领。GitHub 仍是 Cooberped。可信发布和首次发布前的许可证检查还没完成 |
 | 兼容性 | 更新的 Harness 源码版本还没单独测过，暂时不保证兼容 |
 
 本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。

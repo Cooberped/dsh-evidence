@@ -47,10 +47,15 @@ Before the first public release, configure and verify:
 - GitHub Private Vulnerability Reporting is enabled;
 - the release environment requires maintainer approval;
 - npm trusted publishing/provenance is configured before tokenless publication;
-- npm scope ownership is verified. Publish only under the scope: the unscoped
-  names `dsh-files` and `dsh-evidence` are not this project's to take, and the
-  scoped identity must match `package.json` and the verified npm account or
-  organization.
+- npm scope ownership is verified. The npm organization `@cooberped` could not
+  be claimed, so the package is `@baseland/dsh-evidence` on the maintainer's
+  npm account `baseland`. GitHub remains `Cooberped/dsh-evidence`. Publish only
+  under `@baseland`: the unscoped names `dsh-files` and `dsh-evidence` are not
+  this project's to take, and the scoped name must match `package.json`.
+
+npm 组织 `@cooberped` 无法认领，因此包名是维护者 npm 账号 `baseland` 下的
+`@baseland/dsh-evidence`。GitHub 仓库仍是 `Cooberped/dsh-evidence`。只发布这个
+包名；不带组织前缀的 `dsh-files` 和 `dsh-evidence` 不属于本项目。
 
 ## Release gates / 发布 Gate
 
