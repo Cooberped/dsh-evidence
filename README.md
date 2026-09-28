@@ -49,7 +49,7 @@ dsh web                             # restart
 
 Prefer `@beta`. It names this pre-release. A bare `@baseland/dsh-evidence` follows `latest`, and `latest` currently names `0.6.0-beta.1` only because this is the first version on npm: the registry keeps a `latest` tag, and it will not let you remove that tag while it is the only version. When a stable version is published, `latest` should move to it. `@beta` keeps tracking the pre-release.
 
-Release notes: [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1).
+Release notes: [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1). That is the build `@beta` installs today. `main` already has three upload fixes that are not in the package yet: chips for the second and later files in a batch land in the right place, a long Chinese text file is still recognized when the first slice ends in the middle of a character, and a confirmed text card shows its own short extension (`.md` as `MD`) instead of `TXT`. Use the source install below if you need those before the next npm beta.
 
 `dsh plugin add` forwards the rest of the command to pnpm inside the profile, which is the install path in the [Harness bundle publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md). If your npm client uses a China mirror (for example npmmirror) and the package is missing, point this one command at the public registry:
 

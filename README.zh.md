@@ -49,7 +49,7 @@ dsh web                             # 重启
 
 请用 `@beta`。这是这次预发布的标签。只写包名会跟着 `latest` 走，而 `latest` 现在指向 `0.6.0-beta.1`，只是因为这是 npm 上的第一个版本：注册表会保留 `latest`，只剩这一个版本时也不能删。以后发出稳定版时，`latest` 应该改到那个版本。`@beta` 仍表示这次预发布。
 
-说明见 [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)。
+说明见 [v0.6.0-beta.1](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)。`@beta` 现在装到的就是这一版。`main` 上已经有三处上传修正，还没进这个包：同一批里第二个及之后的文件会把卡片插到正确位置；较长的中文文本在开头一段正好切在半个字上时仍会被认出；已确认是文本的卡片会显示自己的短扩展名（`.md` 显示为 `MD`），而不是一律 `TXT`。若要先用这些修正，请用下面的源码安装。
 
 `dsh plugin add` 会把后面的参数交给 profile 里的 pnpm，这也是 [Harness bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.zh.md)里的安装方式。如果你的 npm 客户端走了国内镜像（例如 npmmirror），而镜像上还没有这个包，就给这一条命令指定官方注册表：
 
