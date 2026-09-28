@@ -2,7 +2,7 @@
 # `name` is the installable package name. The row id stays stable across scopes.
 - insert:
     - id: files-toolkit
-      name: '@cooberped/dsh-evidence'
+      name: '@baseland/dsh-evidence'
       config:
         maxFileBytes: 25165824
         readLimit: 2000

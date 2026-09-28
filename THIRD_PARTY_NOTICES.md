@@ -1,14 +1,14 @@
 # Third-Party Notices / 第三方软件声明
 
-This document describes the runtime dependency licenses verified from
-`package.json`, `pnpm-lock.yaml`, and installed package metadata at release
-preparation baseline `ba6cead1b33a5bc53449918350be7618504076bf`. It is an
-inventory aid, not legal advice. The lockfile and each installed package's
-license text remain authoritative for the exact dependency graph.
+This document describes the runtime dependency licenses checked against the
+current `package.json`, `pnpm-lock.yaml`, and the published
+`pdfjs-dist@6.3.289` tarball. It is an inventory aid, not legal advice. The
+lockfile and each installed package's license text remain authoritative for
+the exact dependency graph.
 
-本文记录发布准备基线 `ba6cead1b33a5bc53449918350be7618504076bf` 的运行时
-依赖许可核验结果。它用于透明披露，不代替法律意见；精确依赖图以 lockfile 和各包
-自带许可证为准。
+本文对照当前 `package.json`、`pnpm-lock.yaml`，以及已发布的
+`pdfjs-dist@6.3.289` 压缩包，记录运行时依赖许可。它用于透明披露，不代替法律
+意见；精确依赖图以 lockfile 和各包自带许可证为准。
 
 ## Project license and lineage / 项目许可证与沿革
 
@@ -22,9 +22,9 @@ components remain under their own licenses and are not relicensed as MIT.
 | Package | Resolved version | License | Upstream |
 | --- | ---: | --- | --- |
 | `fflate` | 0.8.3 | MIT | <https://github.com/101arrowz/fflate> |
-| `pdfjs-dist` | 6.2.108 | Apache-2.0, with separately licensed data files described below | <https://github.com/mozilla/pdf.js> |
+| `pdfjs-dist` | 6.3.289 | Apache-2.0, with separately licensed data files described below | <https://github.com/mozilla/pdf.js> |
 | `read-excel-file` | 9.3.10 | MIT | <https://gitlab.com/catamphetamine/read-excel-file> |
-| `saxen` | 11.1.1 | MIT | <https://github.com/nikku/saxen> |
+| `saxen` | 11.2.0 | MIT | <https://github.com/nikku/saxen> |
 
 `read-excel-file` also resolves permissively licensed runtime dependencies in
 the lockfile, including `unzipper-esm` 0.13.3 (MIT), `worker-f` 0.1.20 (MIT),
@@ -50,15 +50,16 @@ upstream npm package also contains data files with their own notices:
 - `cmaps/` carries its own upstream `LICENSE` notice.
 
 Those files are **not relicensed under Apache-2.0 or this project's MIT
-license**. In the currently resolved `pdfjs-dist@6.2.108`, the accompanying
-`LICENSE_LIBERATION` incorrectly contains OFL-1.1 text even though OFL applies
-only to Liberation 2.0 and later. Mozilla confirmed and corrected this upstream
-in [pdf.js PR #21750](https://github.com/mozilla/pdf.js/pull/21750), merged on
-2026-08-10; `6.2.108` was published on 2026-07-28 and therefore predates it.
-The shipped font was checked against this notice rather than assumed: it is
-still Liberation Sans 1.07.4, byte-identical in intent to the 4.x baseline, and
-the mismatched licence file persists. This notice records the actual 1.07.4
-license rather than repeating the mismatched file.
+license**. Mozilla corrected a mismatched `LICENSE_LIBERATION` upstream in
+[pdf.js PR #21750](https://github.com/mozilla/pdf.js/pull/21750), merged on
+2026-08-10. The currently resolved `pdfjs-dist@6.3.289` was published on
+2026-08-29 and includes that correction: `standard_fonts/LICENSE_LIBERATION`
+is the Liberation Font Software agreement (`GPL-2.0-only WITH Liberation font exception`),
+not OFL-1.1. The shipped `LiberationSans-Regular.ttf` name table still reads
+Liberation Sans, version 1.07.4. OFL applies only to Liberation 2.0 and later,
+so these 1.07.4 fonts must not be described as OFL-1.1. The previous resolution
+`6.2.108` (published 2026-07-28) predates the correction and is no longer what
+the lockfile installs.
 
 The `dsh-evidence` PDF parser imports `pdfjs-dist/legacy/build/pdf.mjs`, performs
 text-layer extraction, sets `useSystemFonts: true`, and does not configure a
@@ -72,10 +73,11 @@ texts and notices.
 这里的关键边界是：`pdfjs-dist` 根包标注 Apache-2.0，并不意味着其中字体被重新
 许可为 Apache-2.0；但本项目自己的 npm tarball 也没有复制或内嵌这些字体。依赖
 安装后，字体仍属于独立的 `pdfjs-dist` 包，并继续受各自 BSD 或
-`GPL-2.0-only WITH Liberation font exception` 条款约束。当前上游 npm 包内把
-Liberation 1.07.4 错配为 OFL-1.1 的许可证文件，不能作为本项目的许可依据；升级到
-`6.2.108` 后已实测复核，该字体仍为 Liberation Sans 1.07.4，错配的许可证文件也依然
-存在（`6.2.108` 发布于 2026-07-28，早于 2026-08-10 合并的上游修正）。
+`GPL-2.0-only WITH Liberation font exception` 条款约束。当前 lockfile 解析到
+`pdfjs-dist@6.3.289`（2026-08-29 发布），已包含 2026-08-10 合并的上游修正
+（pdf.js #21750）：包内 `LICENSE_LIBERATION` 是 Liberation 字体协议，不再是
+6.2.108 里错配的 OFL-1.1 文本。字体本身仍是 Liberation Sans 1.07.4，不能写成
+OFL-1.1。
 
 ## Distribution checklist / 分发检查
 
@@ -88,7 +90,6 @@ Before every public release:
 4. update this notice for dependency, bundling, parser, font, or CMap changes;
 5. retain all third-party license files when redistributing third-party assets.
 
-For the first public npm release, either upgrade to a `pdfjs-dist` version that
-contains the merged #21750 correction and rerun focused PDF tests, or retain
-this explicit disclosure and obtain a maintainer's documented license-risk
-acceptance. Never describe the Liberation 1.07.4 fonts as OFL-1.1.
+The resolved `pdfjs-dist@6.3.289` already contains the merged #21750
+correction. Keep this disclosure with the release, and never describe the
+Liberation 1.07.4 fonts as OFL-1.1.
