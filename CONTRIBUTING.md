@@ -19,10 +19,14 @@ notice from [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
 - Reproduction files must be synthetic, minimal, and redistributable.
 - Security vulnerabilities must follow [SECURITY.md](SECURITY.md), not a public
   issue.
+- Do not install `dsh-files` and `@baseland/dsh-evidence` in the same profile.
+  They share the cordis row id `files-toolkit`.
 
 提交前请先检索现有 Issue/PR。大型功能、解析器替换、存储格式或公开接口变化、
 安全敏感重构应先开 Issue 对齐。严禁提交真实业务文档、人力资源数据、凭据、API
-密钥、会话数据或客户数据；复现文件必须是合成、最小且可再分发的材料。
+密钥、会话数据或客户数据；复现文件必须是合成、最小且可再分发的材料。不要在同一个
+profile 里同时安装 `dsh-files` 和 `@baseland/dsh-evidence`，二者共用 cordis 行
+id `files-toolkit`。
 
 ## Development / 本地开发
 

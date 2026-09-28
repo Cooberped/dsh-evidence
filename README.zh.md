@@ -52,6 +52,8 @@ dsh web                             # 重启
 
 本地安装是对当前 checkout 的链接：拉取更新后重新执行 `pnpm install --frozen-lockfile && pnpm build` 并重启。卸载用 `dsh plugin --profile web remove @baseland/dsh-evidence`。
 
+不要在同一个 profile 里同时安装 `dsh-files` 和 `@baseland/dsh-evidence`。两者都注册 cordis 行 id `files-toolkit`，一个 profile 只能加载其中一个。先卸掉一个，再装另一个。
+
 <details>
 <summary>未来的 npm Beta——目前尚不可用</summary>
 
