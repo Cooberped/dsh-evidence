@@ -52,6 +52,8 @@ dsh web                             # restart
 
 The install is a link to this checkout: after pulling updates, re-run `pnpm install --frozen-lockfile && pnpm build` and restart. Remove it with `dsh plugin --profile web remove @baseland/dsh-evidence`.
 
+Do not install `dsh-files` and `@baseland/dsh-evidence` in the same profile. Both register the cordis row id `files-toolkit`, and a profile can load only one plugin under that id. Remove one before adding the other.
+
 <details>
 <summary>Future npm beta — not available yet</summary>
 

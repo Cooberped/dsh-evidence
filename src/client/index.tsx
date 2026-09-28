@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Tooltip, IconPaperclipOutlineRegular, IconCloseOutlineRegular, IconFolderOpenOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import { isRepresentableFileRef, modelFileMention } from '../reference.ts'
+import { referenceInsertionOffset } from './detect-span.ts'
 import { collectDroppedFiles, hasFileTransfer, isRasterImage, shouldOwnDocumentDrop } from './drop.ts'
 
 const SOURCE_NAME = 'dsh-evidence'
@@ -31,8 +32,10 @@ interface PendingUpload {
   name: string
   bytes: number
   sessionId: string
-  status: 'uploading' | 'error'
+  status: 'uploading' | 'ready' | 'error'
   error?: string
+  /** Upload stored the file, but the composer chip was not inserted. */
+  hint?: string
 }
 
 const uploadMeta = new Map<string, UploadMeta>()
@@ -66,6 +69,10 @@ function finishPending(id: string): void {
 
 function failPending(id: string, error: string): void {
   publishPending(pendingSnapshot.map((item) => item.id === id ? { ...item, status: 'error', error } : item))
+}
+
+function readyPending(id: string, hint: string): void {
+  publishPending(pendingSnapshot.map((item) => item.id === id ? { ...item, status: 'ready', hint } : item))
 }
 
 function dismissPending(id: string): void {
@@ -202,9 +209,13 @@ function injectCss(): void {
 }
 
 interface InputSnapshot {
+  /** Clipboard projection: chips expanded to their clipboard text. */
   draft: string
   draftRev: number
   occurrences: Array<{ source: string; ref: string; occurrenceId: number; offset: number; length: number }>
+  /** Detect projection when the host publishes it. Each chip is one U+FFFC. */
+  detectText?: string
+  detectLength?: number
 }
 
 interface InputService {
@@ -235,12 +246,22 @@ function httpErrorText(status: number): string {
   return `HTTP ${status}`
 }
 
-/** 把文件路径插入输入框（上传与文件面板共用）。 */
+// 上传可以并发，chip 插入必须串行：后一个要读到前一个已经提交的 detect 文档。
+let referenceInserts: Promise<void> = Promise.resolve()
+
+function afterReferenceInsert<T>(task: () => Promise<T>): Promise<T> {
+  const run = referenceInserts.then(task, task)
+  referenceInserts = run.then(() => undefined, () => undefined)
+  return run
+}
+
+/** 把文件路径插入输入框。span 取 detect 坐标，每个已有 chip 只占一个 U+FFFC。 */
 async function insertReference(actx: ActionContext, ref: string, label: string): Promise<boolean> {
   const conversation = actx.get('conversation')
   if (conversation === undefined) throw new Error('conversation service unavailable')
   const input = conversation.input.for(actx)
   const state = input.state.getSnapshot()
+  const point = referenceInsertionOffset(state)
   actx.emit('slash/input-insert-reference', {
     reference: {
       source: SOURCE_NAME,
@@ -249,8 +270,8 @@ async function insertReference(actx: ActionContext, ref: string, label: string):
       clipboardText: modelFileMention(ref)
     },
     span: {
-      start: state.draft.length,
-      end: state.draft.length,
+      start: point,
+      end: point,
       draftRev: state.draftRev
     }
   })
@@ -353,9 +374,16 @@ async function attachFile(actx: ActionContext, file: File, sessionId: string, re
     uploadMeta.set(payload.path, meta)
     uploadedPool.set(payload.path, meta)
     clearUploadError()
-    const inserted = await insertReference(actx, payload.path, name)
+    let inserted = false
+    try {
+      inserted = await afterReferenceInsert(() => insertReference(actx, payload.path, name))
+    } catch {
+      inserted = false
+    }
     if (!inserted) {
-      failPending(pendingId, '已上传，可通过 @ 重新选择')
+      // 字节已经在会话目录里。插不上 chip 不等于上传失败，卡片保持可关闭的提示，
+      // 用户用 @ 仍能选到这个文件。
+      readyPending(pendingId, '已上传，可通过 @ 重新选择')
       return
     }
     finishPending(pendingId)
@@ -577,6 +605,8 @@ function UploadDock({ useInput, inputActions }: DockProps) {
       {pending.map((item) => {
         const { bg, ext } = badgeStyle(item.name)
         const failed = item.status === 'error'
+        const ready = item.status === 'ready'
+        const detail = failed ? item.error ?? '上传失败' : ready ? item.hint ?? '已上传，可通过 @ 重新选择' : '上传中'
         return (
           <div
             className={`dsh-evidence-card dsh-evidence-card--${item.status}`}
@@ -588,13 +618,18 @@ function UploadDock({ useInput, inputActions }: DockProps) {
               <span className="dsh-evidence-name" title={item.name}>{item.name}</span>
               <span className="dsh-evidence-meta">
                 <span className="dsh-evidence-size">{formatBytes(item.bytes)}</span>
-                <span className="dsh-evidence-status" title={item.error}>
-                  {failed ? item.error ?? '上传失败' : '上传中'}
+                <span className="dsh-evidence-status" title={failed || ready ? detail : undefined}>
+                  {detail}
                 </span>
               </span>
             </span>
-            {failed && (
-              <button type="button" className="dsh-evidence-remove" aria-label="关闭上传错误" onClick={() => dismissPending(item.id)}>
+            {(failed || ready) && (
+              <button
+                type="button"
+                className="dsh-evidence-remove"
+                aria-label={failed ? '关闭上传错误' : '关闭提示'}
+                onClick={() => dismissPending(item.id)}
+              >
                 <IconCloseOutlineRegular size={12} />
               </button>
             )}
