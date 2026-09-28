@@ -26,17 +26,18 @@ decision.
 
 `@baseland/dsh-evidence@0.6.0-beta.1` is already on npm, and GitHub has the
 pre-release [`v0.6.0-beta.1`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)
-at commit `8bc0418593b4349ab4a6987d33cc86a21399a840`. The list below is what
-still has to be true before a later publish. Publishing from GitHub without an
-npm token stays off until the trusted publisher on npmjs.com and the `release`
-environment approval are both in place. See
-[Trusted publishing](#trusted-publishing--可信发布).
+at commit `8bc0418593b4349ab4a6987d33cc86a21399a840`. That first publish used a
+granular access token on the `baseland` account. The token is not in this
+repository. Later publishes should use trusted publishing, which stays off
+until the publisher on npmjs.com and the `release` environment approval are
+both in place. See [Trusted publishing](#trusted-publishing--可信发布).
 
 `@baseland/dsh-evidence@0.6.0-beta.1` 已经在 npm 上，GitHub 预发布
 [`v0.6.0-beta.1`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.1)
-指向 commit `8bc0418593b4349ab4a6987d33cc86a21399a840`。下面仍是以后发布前要核对的事项。
-在 npmjs.com 上把仓库登记为可信发布者、并且 GitHub 的 `release` 环境要求维护者批准之前，
-GitHub 上这条不使用 npm token 的发布不会生效。见[可信发布](#trusted-publishing--可信发布)。
+指向 commit `8bc0418593b4349ab4a6987d33cc86a21399a840`。这一次是用 `baseland`
+账号的 granular access token 发出的，token 不在仓库里。以后的发布改走可信发布；
+在 npmjs.com 上登记发布者、并且 GitHub 的 `release` 环境要求维护者批准之前，
+这条路径不会生效。见[可信发布](#trusted-publishing--可信发布)。
 
 Configure and verify:
 
@@ -167,7 +168,8 @@ npm publish --access public --tag beta
 ```
 
 The command above is an operator action, not a CI test. Do not run it during
-ordinary pull-request validation. Merging a pull request does not publish.
+ordinary pull-request validation. Merging a pull request does not publish, and
+neither does pushing a tag.
 
 ### 6. Post-publication verification
 
@@ -196,8 +198,10 @@ npm gives you no other choice. The next prerelease does not inherit `latest`.
 When a stable version such as `0.6.0` is ready, and `package.json` no longer
 has a prerelease suffix:
 
-1. Publish that version with `--tag latest`. The manual workflow input
-   `dist_tag=latest` does this. A GitHub Release by itself does not.
+1. Publish that version with `--tag latest`. Start
+   `.github/workflows/publish.yml` by hand and choose `dist_tag=latest`.
+   Pushing a tag, or publishing a GitHub Release, does not upload the package
+   and does not move `latest`.
 2. If that exact version is already on npm under another tag, point `latest`
    at the existing tarball instead of publishing it again:
 
@@ -219,100 +223,133 @@ npm 不允许删掉唯一的 `latest`。以后的预发布只更新 `beta`，不
 稳定版准备好之后，用 `--tag latest` 发布；如果这个版本已经在 npm 上，就用
 `npm dist-tag add @baseland/dsh-evidence@<版本> latest` 把 `latest` 指过去，
 不要用同一个版本号再发一次。`beta` 标签留着，继续给预发布用。
-只在 GitHub 上发一个正式 Release 不会移动 `latest`。
+推 tag，或在 GitHub 上发 Release，都不会上传包，也不会移动 `latest`。
+要发稳定版，得手动跑 `.github/workflows/publish.yml` 并选择 `dist_tag=latest`。
 
 ## Trusted publishing / 可信发布
 
-`.github/workflows/publish.yml` publishes with GitHub's OIDC token
-(`id-token: write`). npm exchanges that token for a short-lived publish
-credential. The repository does not contain an npm token, and the workflow
-must not be given `NPM_TOKEN` or `NODE_AUTH_TOKEN`.
+`0.6.0-beta.1` was published with a granular access token. Trusted publishing
+is how later versions go out. `.github/workflows/publish.yml` asks GitHub for
+an OIDC token and npm exchanges it for a short-lived publish credential.
+There is no npm token in the repository, and this workflow must not be given
+an `NPM_TOKEN` secret.
 
-Adding the workflow does not publish. It does not run on push or pull request.
-It runs when a maintainer starts it by hand, or when someone publishes a GitHub
-**pre-release**. The job uses the GitHub environment `release`, which must
-require a maintainer's approval. A normal GitHub release (not marked
-pre-release) does not upload anything and does not move `latest`.
+The publish job sets `permissions: contents: read` and `id-token: write`.
+`id-token: write` is what lets GitHub mint the OIDC token. The job also sets
+`environment: release`. On GitHub, that environment must require a maintainer
+reviewer before the first run. Pushing a commit, opening a pull request, or
+pushing a tag does not publish. A maintainer starts the workflow by hand, and
+the environment approval is the second check. If a tag trigger is added later,
+keep `environment: release` so a tag push still waits for that reviewer.
 
-The hand-started run defaults to `--tag beta`. Choosing `latest` is the
-explicit stable input. The job refuses that choice when `package.json` still
-contains a prerelease suffix such as `-beta.1`. A GitHub pre-release always
-publishes with `--tag beta`.
+The manual run defaults to `--tag beta`. Use that for prerelease versions.
+`latest` is a separate input, and the job accepts it only when `package.json`
+has no prerelease suffix. A version such as `0.6.0-beta.2` cannot move
+`latest`.
 
-`npm publish` in the workflow runs `prepublishOnly`, which is `release:check`.
-A failing check stops the publish before npm accepts the tarball. Provenance
-is requested with `--provenance`. npm also attaches provenance automatically
-for a public package published this way from a public repository.
+`actions/setup-node` is called with `registry-url: https://registry.npmjs.org`.
+That is the OIDC setup in the current npm docs. It writes a project `.npmrc`
+that can read `NODE_AUTH_TOKEN`. Leave that file as the action wrote it. Do
+not create `NPM_TOKEN`. With npm 11.5.1 or newer, the CLI uses the OIDC token
+for `npm publish` before it falls back to a stored token.
 
-Trusted publishing needs npm CLI 11.5.1 or newer and Node.js 22.14.0 or newer,
-on a GitHub-hosted runner. The workflow uses Node.js 24.3.0, the same version
-as the release check in CI, then installs npm 11.5.1. npm does not accept this
-OIDC flow from a self-hosted runner. `repository.url` in `package.json` must
-stay `git+https://github.com/Cooberped/dsh-evidence.git`.
+The workflow pins Node.js 24.5.0 because that is the first Node.js 24 release
+whose bundled npm is 11.5.1. Node.js 24.3.0, which CI still uses for the
+release check, bundles npm 11.4.2. That older CLI fails the OIDC handshake and
+reports a misleading `E404`. Do not "fix" the publish job by dropping back to
+24.3.0 or by publishing with an older npm. The job checks the bundled npm
+version and stops if it is below 11.5.1. npm does not accept this OIDC flow
+from a self-hosted runner. `repository.url` in `package.json` must stay
+`git+https://github.com/Cooberped/dsh-evidence.git`.
+
+`npm publish` runs `prepublishOnly`, which is `release:check`. A failing check
+stops the upload. The command passes `--provenance`. npm also attaches
+provenance on its own for a public package published this way from a public
+repository.
 
 ### One-time setup on npmjs.com
 
 Do this once, as the `baseland` account that owns `@baseland/dsh-evidence`,
 after `publish.yml` is on the default branch. npm does not check the fields
-when you save them. A typo shows up only on the next publish.
+when you save them. A typo shows up only on the next publish, often as an
+authentication failure rather than "wrong repository".
 
 1. Open the package on npmjs.com, signed in as `baseland`:
    <https://www.npmjs.com/package/@baseland/dsh-evidence>
 2. Settings → Trusted Publisher → GitHub Actions.
-3. Enter:
+3. Match these fields exactly:
    - Organization or user: `Cooberped`
    - Repository: `dsh-evidence`
-   - Workflow filename: `publish.yml` (the file name only, including `.yml`)
-   - Environment name: `release` (same name as the workflow's `environment`)
+   - Workflow filename: `publish.yml`
+     Enter only the filename, including `.yml`. Not
+     `.github/workflows/publish.yml`.
+   - Environment name: `release`
+     This field is optional on npm. Fill it in because the workflow sets
+     `environment: release`. If you leave it blank on npm, delete
+     `environment:` from the workflow, or the publish will be rejected.
    - Allowed actions: allow direct `npm publish`. The workflow runs
      `npm publish`, not `npm stage publish`.
 4. On GitHub, open Settings → Environments → `release` and require approval
    from a maintainer **before** the first run. If that protection is missing,
    GitHub creates the environment on the first run with no reviewer.
-5. Do not add an npm token to GitHub. Do not commit one.
+5. Do not add `NPM_TOKEN` or any other npm token to the repository or to
+   GitHub Actions secrets. The granular token used for `0.6.0-beta.1` stays
+   out of git as well.
 6. After one publish through this workflow has succeeded, you can tighten the
    package: Settings → Publishing access → "Require two-factor authentication
    and disallow tokens". Trusted publishing keeps working. A local fallback
    then needs an interactive login, not a token stored in the repo.
 
-`.github/workflows/publish.yml` 用 GitHub 的 OIDC（`id-token: write`）向 npm 要一次
-短期发布凭据。仓库里不放 npm token，也不要给这个 workflow 配置 `NPM_TOKEN` 或
-`NODE_AUTH_TOKEN`。
+`0.6.0-beta.1` 是用 granular access token 发出的。以后的版本走可信发布。
+`.github/workflows/publish.yml` 向 GitHub 要 OIDC token，npm 再换成一次短期发布凭据。
+仓库里没有 npm token，也不要给这个 workflow 配 `NPM_TOKEN`。
 
-把文件加进仓库不会发布。push 和 pull request 都不会跑它。维护者手动启动，或者有人
-发布一个标成 **pre-release** 的 GitHub Release 时才会跑，并且会停在名为 `release`
-的 GitHub 环境上等待维护者批准。没有标成 pre-release 的 GitHub Release 不会上传，
-也不会移动 `latest`。
+发布 job 的权限是 `contents: read` 和 `id-token: write`。后者才让 GitHub 签发
+OIDC token。job 还设置了 `environment: release`。在 GitHub 上，这个环境必须在第一次
+运行前就要求维护者批准。push、pull request、推 tag 都不会发布。维护者手动启动 workflow，
+环境批准是第二道检查。以后如果改成由 tag 触发，仍然要留着 `environment: release`，
+这样推 tag 也会停下来等人批。
 
-手动启动时默认 `--tag beta`。只有明确选 `latest` 才当作稳定版；如果 `package.json`
-的版本号还带 `-beta` 这类后缀，任务会拒绝。GitHub pre-release 一律只用 `--tag beta`。
+手动运行默认 `--tag beta`，预发布用这个。`latest` 是另一个选项，只有 `package.json`
+的版本号不带预发布后缀时才会接受。`0.6.0-beta.2` 这种版本不能去动 `latest`。
 
-workflow 里的 `npm publish` 会先跑 `prepublishOnly`（也就是 `release:check`）。
-检查失败就不会把包交给 npm。命令带 `--provenance`。公开仓库发布公开包时，npm
-也会自动附上来源证明。
+`actions/setup-node` 使用 `registry-url: https://registry.npmjs.org`。这是当前 npm
+文档里的 OIDC 写法，它会在仓库目录写一份可读 `NODE_AUTH_TOKEN` 的 `.npmrc`。留着这份文件，
+不要另建 `NPM_TOKEN`。npm 11.5.1 及更新版本在 `npm publish` 时会先用 OIDC token，
+然后才回退到保存的 token。
 
-这条路径要求 npm CLI 11.5.1 或更新、Node.js 22.14.0 或更新，并且是 GitHub 托管的
-runner。workflow 使用与 CI 发布检查相同的 Node.js 24.3.0，再安装 npm 11.5.1。
-自托管 runner 不能用这套 OIDC。`package.json` 里的 `repository.url` 必须保持
+workflow 固定 Node.js 24.5.0，因为这是第一版自带 npm 11.5.1 的 Node.js 24。
+CI 里发布检查仍用的 Node.js 24.3.0 自带 npm 11.4.2。那个旧 CLI 做 OIDC 握手会失败，
+并报一个容易看错的 `E404`。不要把发布 job 降回 24.3.0，也不要用更旧的 npm 去发布。
+job 会检查自带的 npm，低于 11.5.1 就停。自托管 runner 不能用这套 OIDC。
+`package.json` 里的 `repository.url` 必须保持
 `git+https://github.com/Cooberped/dsh-evidence.git`。
+
+`npm publish` 会先跑 `prepublishOnly`（也就是 `release:check`）。检查失败就不会上传。
+命令带 `--provenance`。公开仓库发布公开包时，npm 也会自动附上来源证明。
 
 ### 在 npmjs.com 上做一次
 
 用拥有 `@baseland/dsh-evidence` 的 `baseland` 账号操作。先把 `publish.yml` 合并到
-默认分支。npm 保存时不校验这些字段，写错要到下一次发布才看得到。
+默认分支。npm 保存时不校验这些字段，写错要到下一次发布才看得到，而且多半显示成认证失败，
+而不是「仓库填错了」。
 
 1. 登录 npmjs.com，打开 <https://www.npmjs.com/package/@baseland/dsh-evidence>。
 2. Settings → Trusted Publisher → GitHub Actions。
-3. 填写：
+3. 下面几项必须逐字一致：
    - Organization or user：`Cooberped`
    - Repository：`dsh-evidence`
-   - Workflow filename：`publish.yml`（只写文件名，带 `.yml`）
-   - Environment name：`release`（与 workflow 里的 `environment` 相同）
+   - Workflow filename：`publish.yml`
+     只填文件名，带 `.yml`。不要填 `.github/workflows/publish.yml`。
+   - Environment name：`release`
+     这一项在 npm 上可以不填。workflow 写了 `environment: release`，所以这里要填。
+     如果 npm 上留空，就要把 workflow 里的 `environment:` 也去掉，否则发布会被拒绝。
    - Allowed actions：允许直接 `npm publish`。workflow 跑的是 `npm publish`，
      不是 `npm stage publish`。
 4. 在 GitHub 上打开 Settings → Environments → `release`，**第一次运行之前**就要求
    维护者批准。如果没有这层保护，GitHub 会在第一次运行时建出一个没有审批人的环境。
-5. 不要把 npm token 加到 GitHub，也不要提交到仓库。
+5. 不要把 `NPM_TOKEN` 或任何 npm token 放进仓库，也不要放进 GitHub Actions secrets。
+   发 `0.6.0-beta.1` 用过的 granular token 同样不要进 git。
 6. 这条 workflow 成功发布过一次之后，可以收紧包的设置：Settings → Publishing access
    → “Require two-factor authentication and disallow tokens”。可信发布仍然可用。
    本机补发则改为交互登录，而不是在仓库里存 token。

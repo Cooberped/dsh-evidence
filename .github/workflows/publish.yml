@@ -1,19 +1,20 @@
 name: Publish
 
-# Tokenless npm publish for @baseland/dsh-evidence.
-# Push and pull_request do not run this workflow.
-# A maintainer starts it by hand, or a GitHub pre-release does.
-# The release environment is expected to require maintainer approval.
-# The default dist-tag is beta. latest is only the explicit manual choice,
-# and only for a version that is not a prerelease.
+# Future publishes of @baseland/dsh-evidence. The first version,
+# 0.6.0-beta.1, was published with a granular npm token. That token is
+# not stored here. This workflow uses GitHub OIDC only.
+#
+# It does not run on push, pull_request, or tag creation. A maintainer
+# starts it with workflow_dispatch, then the release environment must
+# approve the job. If a tag trigger is added later, keep environment: release.
 
 on:
   workflow_dispatch:
     inputs:
       dist_tag:
         description: >-
-          npm dist-tag. beta is the pre-release tag. latest is only for a
-          non-prerelease version you have decided to call stable.
+          npm dist-tag. beta is the default and the tag for prereleases.
+          latest is only for a non-prerelease version you have decided to call stable.
         type: choice
         options:
           - beta
@@ -25,8 +26,6 @@ on:
           Leave empty to use the ref selected for this run.
         required: false
         type: string
-  release:
-    types: [published]
 
 permissions:
   contents: read
@@ -38,7 +37,6 @@ concurrency:
 jobs:
   publish:
     name: publish
-    if: github.event_name == 'workflow_dispatch' || github.event.release.prerelease == true
     runs-on: ubuntu-latest
     environment: release
     timeout-minutes: 30
@@ -49,15 +47,11 @@ jobs:
       - name: Choose the commit to publish
         id: target
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
           INPUT_REF: ${{ inputs.git_ref }}
           DEFAULT_SHA: ${{ github.sha }}
         run: |
           set -eu
-          if [ "$EVENT_NAME" = release ]; then
-            ref="$RELEASE_TAG"
-          elif [ -n "${INPUT_REF}" ]; then
+          if [ -n "${INPUT_REF}" ]; then
             ref="$INPUT_REF"
           else
             ref="$DEFAULT_SHA"
@@ -76,15 +70,35 @@ jobs:
           ref: ${{ steps.target.outputs.ref }}
           persist-credentials: false
 
-      - name: Use Node.js 24.3.0
+      # registry-url is the OIDC setup npm documents. Do not add an NPM_TOKEN secret.
+      # Node.js 24.5.0 is the first 24.x that bundles npm 11.5.1. 24.3.0 bundles
+      # npm 11.4.2, and that CLI fails the OIDC handshake with a misleading E404.
+      - name: Use Node.js 24.5.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24.3.0
+          node-version: 24.5.0
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
-      - name: Install the npm CLI that trusted publishing requires
-        run: npm install --global npm@11.5.1
+      - name: Require the bundled npm that trusted publishing needs
+        run: |
+          set -eu
+          node --input-type=module <<'EOF'
+          import { execSync } from 'node:child_process'
+          const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number)
+          if (nodeMajor < 24 || (nodeMajor === 24 && nodeMinor < 5)) {
+            console.error(`Node.js ${process.versions.node} is too old. Use 24.5.0 or newer so the bundled npm is at least 11.5.1.`)
+            process.exit(1)
+          }
+          const npmVersion = execSync('npm --version', { encoding: 'utf8' }).trim()
+          const parts = npmVersion.split('.').map(Number)
+          const tooOld = parts[0] < 11 || (parts[0] === 11 && (parts[1] < 5 || (parts[1] === 5 && parts[2] < 1)))
+          if (tooOld) {
+            console.error(`npm ${npmVersion} cannot complete trusted publishing. Need >= 11.5.1. Older npm fails the OIDC handshake with a misleading E404.`)
+            process.exit(1)
+          }
+          console.log(`node ${process.versions.node}, npm ${npmVersion}`)
+          EOF
 
       - name: Enable pinned pnpm
         run: corepack enable && corepack prepare pnpm@10.34.5 --activate
@@ -94,24 +108,17 @@ jobs:
 
       - name: Publish to npm
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          DIST_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.dist_tag || 'beta' }}
+          DIST_TAG: ${{ inputs.dist_tag }}
         run: |
           set -eu
-          if [ -n "${NODE_AUTH_TOKEN:-}" ] || [ -n "${NPM_TOKEN:-}" ]; then
-            echo "::error::refusing to publish with an npm token; this workflow uses GitHub OIDC only"
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "::error::refusing to publish with NPM_TOKEN; this workflow uses GitHub OIDC only"
             exit 1
-          fi
-          unset NODE_AUTH_TOKEN || true
-          if [ -f .npmrc ]; then
-            grep -v '_authToken' .npmrc > .npmrc.without-token || true
-            mv .npmrc.without-token .npmrc
           fi
           node --input-type=module <<'EOF'
           import { readFileSync } from 'node:fs'
           const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
-          const tag = process.env.DIST_TAG
-          const event = process.env.EVENT_NAME
+          const tag = process.env.DIST_TAG || 'beta'
           if (pkg.name !== '@baseland/dsh-evidence') {
             console.error(`refusing to publish unexpected package ${pkg.name}`)
             process.exit(1)
@@ -120,25 +127,15 @@ jobs:
             console.error(`refusing unsupported dist-tag ${tag}`)
             process.exit(1)
           }
-          if (event !== 'workflow_dispatch' && tag !== 'beta') {
-            console.error('a GitHub release may only publish with --tag beta')
+          const prerelease = pkg.version.includes('-')
+          if (prerelease && tag !== 'beta') {
+            console.error(`refusing to publish prerelease ${pkg.version} with dist-tag ${tag}; use beta`)
             process.exit(1)
           }
-          if (tag === 'latest' && pkg.version.includes('-')) {
+          if (tag === 'latest' && prerelease) {
             console.error(`refusing to point latest at prerelease ${pkg.version}`)
             process.exit(1)
           }
           console.log(`publishing ${pkg.name}@${pkg.version} with dist-tag ${tag}`)
           EOF
           npm publish --access public --tag "$DIST_TAG" --provenance
-
-  stable-github-release:
-    name: stable GitHub release does not publish
-    if: github.event_name == 'release' && github.event.release.prerelease == false
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions: {}
-    steps:
-      - name: Leave npm latest unchanged
-        run: |
-          echo "::warning::This GitHub release is not marked as a pre-release, so nothing was published and the npm latest tag was not moved. To publish a non-prerelease version as latest, run the Publish workflow manually and choose dist-tag latest."
