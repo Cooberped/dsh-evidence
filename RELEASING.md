@@ -158,28 +158,33 @@ Later prereleases still publish with `--tag beta`. That must leave `latest`
 where it is. Do not pass `--tag latest`, and do not run `npm dist-tag add …
 latest`, for a prerelease.
 
-The next prerelease is `0.6.0-beta.2` (`package.json` on `main` after the
-version bump is merged). Merging that pull request does not publish, and it
-does not create a GitHub tag or Release. A maintainer does both afterward:
+The next prerelease is `0.6.0-beta.3` (`package.json` on `main` after the
+version bump is merged). It only picks up the devDependency lockfile bump of
+`@types/node` from 26.6.2 to 26.6.3, and the transitive `ws` lockfile change
+that came with it. There is no runtime behavior change. Merging that pull
+request does not publish, and it does not create a GitHub tag or Release. A
+maintainer does both afterward:
 
 - npm: `npm publish --access public --tag beta`. If the trusted publisher on
   npmjs.com and the `release` environment approval are already in place, the
   manual workflow with dist-tag `beta` is the same publish. This document does
   not record that the publisher has been saved on npmjs.com.
-- After that publish, `beta` names `0.6.0-beta.2` and `latest` still names
+- After that publish, `beta` names `0.6.0-beta.3` and `latest` still names
   `0.6.0-beta.1`.
-- GitHub: create the pre-release tag `v0.6.0-beta.2` by hand, on the merge
+- GitHub: create the pre-release tag `v0.6.0-beta.3` by hand, on the merge
   commit. Do not let CI create it.
 
-下一次预发布是 `0.6.0-beta.2`（版本号合并进 `main` 之后，以 `package.json` 为准）。
-合并那个 pull request 不会发布，也不会创建 GitHub tag 或 Release。两件事都由维护者
+下一次预发布是 `0.6.0-beta.3`（版本号合并进 `main` 之后，以 `package.json` 为准）。
+这一版只跟上开发依赖 lockfile 里 `@types/node` 从 26.6.2 到 26.6.3 的锁定版本，
+以及随之带上的传递依赖 `ws` 的 lockfile 变化，运行时行为没有变化。合并那个
+pull request 不会发布，也不会创建 GitHub tag 或 Release。两件事都由维护者
 在合并之后单独做：
 
 - npm：`npm publish --access public --tag beta`。若 npmjs.com 上的可信发布者和
   `release` 环境的批准都已经配好，手动跑发布 workflow 并选择 dist-tag `beta`
   是同一次发布。本文不记录发布者已经在 npmjs.com 上保存。
-- 发出之后，`beta` 指向 `0.6.0-beta.2`，`latest` 仍是 `0.6.0-beta.1`。
-- GitHub：手工创建 pre-release，tag 为 `v0.6.0-beta.2`，指向合并 commit。不要让
+- 发出之后，`beta` 指向 `0.6.0-beta.3`，`latest` 仍是 `0.6.0-beta.1`。
+- GitHub：手工创建 pre-release，tag 为 `v0.6.0-beta.3`，指向合并 commit。不要让
   CI 创建。
 
 Verify the candidate version does not already exist, then publish only after a
@@ -205,8 +210,8 @@ neither does pushing a tag.
   upload, one search, and one coordinate read for the documented formats.
 - Run `npm dist-tag ls @baseland/dsh-evidence`. After the first publish,
   `latest` and `beta` both name `0.6.0-beta.1`. A later prerelease may move
-  `beta` only. After `0.6.0-beta.2` is published with `--tag beta`, `beta`
-  names `0.6.0-beta.2` and `latest` still names `0.6.0-beta.1`. `latest` moves
+  `beta` only. After `0.6.0-beta.3` is published with `--tag beta`, `beta`
+  names `0.6.0-beta.3` and `latest` still names `0.6.0-beta.1`. `latest` moves
   only under [Stable promotion](#stable-promotion--稳定版).
 - Publish checksums/evidence without user documents or secrets.
 

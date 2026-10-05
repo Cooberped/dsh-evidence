@@ -8,6 +8,12 @@
 - `THIRD_PARTY_NOTICES.md` 与当前 lockfile 对齐：`saxen` 为 11.2.0，`pdfjs-dist` 为已解析的 6.3.289。该版本于 2026-08-29 发布，包内 `LICENSE_LIBERATION` 已是 Liberation 字体协议（上游 #21750，2026-08-10 合并），不再是 6.2.108 里错配的 OFL-1.1 文本。字体本身仍是 Liberation Sans 1.07.4。
 - 适配 DeepSeek Harness 0.1.7-rc.2：`@deepseek-ai/dsh-client-ui-primitives` 在 0.1.7 中把带尺寸后缀的图标改名（`IconPaperclipOutline16` / `IconCloseOutline16` / `IconFolderOpenOutline16` → 按线宽拆成 `…Regular` / `…Medium` 两个变体，本插件与内核主流用法一致选 `IconPaperclipOutlineRegular` / `IconCloseOutlineRegular` / `IconFolderOpenOutlineRegular`，尺寸继续走 `size` 属性；上游 commit `4937343a5e`「unify the client visual language」）。旧名字在 0.1.7 下解析为 `undefined`，`conversation.input.left` 槽位里的上传按钮渲染即抛 React #130，整个输入区左侧按钮组失效。改用新名字，并把 `@deepseek-ai/dsh-*` 的 dev/peer 依赖钉到 `0.1.7-rc.2`（`dsh-client-runtime` 在 npm 上止于 `0.1.1-rc.2`：devDependency 保持该精确版本，peer 放宽为 `^0.1.1-rc.2`，以免宿主把精确 pin 判成与当前内核不兼容）。**注意：改动后不再兼容 0.1.6 及更早的内核**（旧内核没有新名字）。图标改名已在真实 0.1.7-alpha.2 harness 中启动验证：上传按钮正常渲染，控制台无 #130；peer 现钉在已测试的 `0.1.7-rc.2`。
 
+## 0.6.0-beta.3
+
+- 这一版只跟上开发依赖 lockfile 里 `@types/node` 从 26.6.2 到 26.6.3 的锁定版本，以及随之带上的传递依赖 `ws` 的 lockfile 变化。运行时行为没有变化。
+
+这一版仍是预发布。合并版本号不会发布到 npm，也不会创建 GitHub Release。维护者另行执行 `npm publish --tag beta`，并单独创建 GitHub pre-release `v0.6.0-beta.3`。发布之后 `beta` 指向这一版，`latest` 继续留在 `0.6.0-beta.1`。
+
 ## 0.6.0-beta.2
 
 - 同一批上传多个文件时，后面的卡片会插到输入框里正确的位置。插入位置以前按剪贴板草稿的长度来算。输入框里每个卡片只占一个检测位置，草稿里却是展开后的 `@路径` 加空格，两套长度从第二个文件开始就对不上，于是后面的 XLS、DOC、PDF 卡片会偏掉。
