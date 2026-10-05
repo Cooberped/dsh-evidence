@@ -15,7 +15,7 @@
 在 Web 输入框上传文件或整个文件夹。解析和索引都留在本机。模型先检索紧凑证据，再按需展开准确的页码、幻灯片、行区间或表格范围——而不是把全文塞进 prompt，也不用退回 Python 遍历。栅格图片继续走 Harness 原生视觉链路。
 
 > [!IMPORTANT]
-> **npm Beta 已经可以安装。** 公开的预发布版本是 [`@baseland/dsh-evidence@0.6.0-beta.2`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.2)，包页面在 [`@baseland/dsh-evidence`](https://www.npmjs.com/package/@baseland/dsh-evidence)。请用 `@beta` 安装这一版。`latest` 仍指向第一个已发布版本 `0.6.0-beta.1`，因为这次预发布不会移动它。这不是稳定版承诺。
+> **npm Beta 已经可以安装。** 公开的预发布版本是 [`@baseland/dsh-evidence@0.6.0-beta.3`](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.3)，包页面在 [`@baseland/dsh-evidence`](https://www.npmjs.com/package/@baseland/dsh-evidence)。请用 `@beta` 安装这一版。`latest` 仍指向第一个已发布版本 `0.6.0-beta.1`，因为这次预发布不会移动它。这不是稳定版承诺。
 >
 > GitHub 仓库仍是 [Cooberped/dsh-evidence](https://github.com/Cooberped/dsh-evidence)。npm 包名是 `@baseland/dsh-evidence`，因为 npm 组织 `@cooberped` 无法认领。
 
@@ -47,9 +47,9 @@ dsh --profile web --dump-config     # 确认组合配置中已有该 bundle laye
 dsh web                             # 重启
 ```
 
-请用 `@beta`。它指向这次预发布 `0.6.0-beta.2`。只写包名会跟着 `latest` 走，而 `latest` 仍是 `0.6.0-beta.1`。那是 npm 上的第一个版本，注册表会保留 `latest`；用 `beta` 标签发布这一版不会移动它。以后发出稳定版时，`latest` 应该改到那个版本。`@beta` 继续表示预发布。
+请用 `@beta`。它指向这次预发布 `0.6.0-beta.3`。只写包名会跟着 `latest` 走，而 `latest` 仍是 `0.6.0-beta.1`。那是 npm 上的第一个版本，注册表会保留 `latest`；用 `beta` 标签发布这一版不会移动它。以后发出稳定版时，`latest` 应该改到那个版本。`@beta` 继续表示预发布。
 
-说明见 [v0.6.0-beta.2](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.2)。`@beta` 装到的就是这一版。它带上了 `0.6.0-beta.1` 里还没有的三处上传修正：同一批里第二个及之后的文件会把卡片插到正确位置；较长的中文文本在开头一段正好切在半个字上时仍会被认出；已确认是文本的卡片会显示自己的短扩展名（`.md` 显示为 `MD`），而不是一律 `TXT`。
+说明见 [v0.6.0-beta.3](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.3)。`@beta` 装到的就是这一版。运行时行为和 `0.6.0-beta.2` 一样，仍带有 `0.6.0-beta.1` 里还没有的三处上传修正：同一批里第二个及之后的文件会把卡片插到正确位置；较长的中文文本在开头一段正好切在半个字上时仍会被认出；已确认是文本的卡片会显示自己的短扩展名（`.md` 显示为 `MD`），而不是一律 `TXT`。这一版只跟上开发依赖 lockfile 里 `@types/node` 从 26.6.2 到 26.6.3 的锁定版本，以及随之带上的传递依赖 `ws` 的 lockfile 变化。
 
 `dsh plugin add` 会把后面的参数交给 profile 里的 pnpm，这也是 [Harness bundle 发布指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.zh.md)里的安装方式。如果你的 npm 客户端走了国内镜像（例如 npmmirror），而镜像上还没有这个包，就给这一条命令指定官方注册表：
 
@@ -233,7 +233,7 @@ dsh --profile web --dump-config
 | 目前测过 | npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile |
 | 最低版本 | **0.1.7 或更高。** 在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。若仍要跑更旧的 Harness，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；仓库没有为旧版打过 release tag |
 | 实测目标模型 | OpenCode Go — DeepSeek V4 Flash |
-| npm | **公开 Beta** [`@baseland/dsh-evidence@0.6.0-beta.2`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.2)（[GitHub pre-release v0.6.0-beta.2](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.2)）。请用 `@beta` 安装。`latest` 仍留在第一个已发布版本 `0.6.0-beta.1`；这次预发布不会移动它，这也不是稳定版。GitHub 仍是 Cooberped。包在维护者的 npm 账号 `baseland` 下，因为组织 `@cooberped` 无法认领 |
+| npm | **公开 Beta** [`@baseland/dsh-evidence@0.6.0-beta.3`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.3)（[GitHub pre-release v0.6.0-beta.3](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.3)）。请用 `@beta` 安装。`latest` 仍留在第一个已发布版本 `0.6.0-beta.1`；这次预发布不会移动它，这也不是稳定版。GitHub 仍是 Cooberped。包在维护者的 npm 账号 `baseland` 下，因为组织 `@cooberped` 无法认领 |
 | 兼容性 | 更新的 Harness 源码版本还没单独测过，暂时不保证兼容 |
 
 本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。

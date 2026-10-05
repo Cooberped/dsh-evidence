@@ -1,6 +1,6 @@
 {
   "name": "@baseland/dsh-evidence",
-  "version": "0.6.0-beta.2",
+  "version": "0.6.0-beta.3",
   "description": "Independent community DeepSeek Harness plugin for secure multi-file upload, native images, local document retrieval, and coordinate-aware text/PDF/DOCX/XLSX/PPTX reading.",
   "keywords": [
     "deepseek-harness",
