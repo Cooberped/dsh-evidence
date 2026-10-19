@@ -35,9 +35,9 @@
 
 ## 安装
 
-需要带 `web` profile 的 DeepSeek Harness CLI（目前按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 测过）和 Node.js `>=22.13.0`。从源码安装还需要 `PATH` 里有 `pnpm`。
+需要带 `web` profile 的 DeepSeek Harness CLI，以及 Node.js `>=22.13.0`。从源码安装还需要 `PATH` 里有 `pnpm`。日常行为仍按 npm `@deepseek-ai/dsh@0.1.7-rc.2` 核对。包里同时声明了 `engines.dsh`：`>=0.1.7-rc.2 <0.3.0`，所以 0.3.0 以下的 0.2.x 宿主也可以安装。
 
-需要 DeepSeek Harness 0.1.7 或更高。当前代码使用 `…Regular` 图标名，并把 `@deepseek-ai/dsh-*` 的 peer 依赖钉在 `0.1.7-rc.2`。在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。仓库没有为旧版打过 release tag；若仍要跑 ≤ 0.1.6，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)。
+下限是 Harness 0.1.7-rc.2。上传按钮仍使用 `…Regular` 图标名。`@deepseek-ai/dsh-client-ui-primitives@0.2.1-rc.2` 仍导出这些名字，`conversation.input.left` 和 `conversation.input.dock` 也仍在 0.2.0-rc.2 与 0.2.1-rc.2 的会话客户端里。0.1.6 及更早版本上，图标会对不上。仓库没有为旧版打过 release tag；若仍要跑 ≤ 0.1.6，请用图标改名之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)。
 
 ### 从 npm 安装
 
@@ -221,7 +221,7 @@ dsh --profile web --dump-config
 - PPTX 图表、SmartArt、动画和嵌入对象不做解释。
 - 上传配额锁是进程内的，不是跨进程事务。
 - 纯 Node 没有完整可移植的 dirfd/openat 链，同 UID 恶意进程抢占祖先目录仍属于 OS 隔离边界。
-- 兼容范围限于已经测过的 Harness 版本。更新的版本还没按同样方式测过，暂时不保证兼容。
+- 清单允许 0.3.0 以下的 Harness 0.2.x 安装。端到端用过的仍是 0.1.7-rc.2 的 web profile；换更新的宿主之前，请先在本机冒烟。
 
 </details>
 
@@ -231,10 +231,10 @@ dsh --profile web --dump-config
 | --- | --- |
 | 项目 | 公开源码 Beta，由 Cooberped 独立维护 |
 | 目前测过 | npm `@deepseek-ai/dsh@0.1.7-rc.2` 的 `web` profile |
-| 最低版本 | **0.1.7 或更高。** 在 0.1.6 及更早版本上，上传图标会对不上，peer 依赖也对不上。若仍要跑更旧的 Harness，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；仓库没有为旧版打过 release tag |
+| 最低版本 | **0.1.7-rc.2 或更高，且低于 0.3.0。** 在 0.1.6 及更早版本上，上传图标会对不上。若仍要跑更旧的 Harness，请用那次改动之前的代码，或上游 [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files)；仓库没有为旧版打过 release tag |
 | 实测目标模型 | OpenCode Go — DeepSeek V4 Flash |
 | npm | **公开 Beta** [`@baseland/dsh-evidence@0.6.0-beta.4`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.4)（[GitHub pre-release v0.6.0-beta.4](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.4)）。请用 `@beta` 安装。`latest` 仍留在第一个已发布版本 `0.6.0-beta.1`；这次预发布不会移动它，这也不是稳定版。GitHub 仍是 Cooberped。包在维护者的 npm 账号 `baseland` 下，因为组织 `@cooberped` 无法认领 |
-| 兼容性 | 更新的 Harness 源码版本还没单独测过，暂时不保证兼容 |
+| 兼容性 | `engines.dsh` 为 `>=0.1.7-rc.2 <0.3.0`。`@deepseek-ai/dsh-*` 的 peer 使用同一范围，只有 `@deepseek-ai/dsh-client-runtime` 是 `>=0.1.1-rc.2 <0.3.0`，因为 npm 上没有更新的那一包。Harness 0.2.1 读 `engines.dsh`，忽略这些 peer。0.1.7-rc.2 和 0.2.0-rc.2 仍按 peer 判断。这是安装声明；这里还没有把完整的 0.2 会话重新跑一遍 |
 
 本项目**不是 DeepSeek 官方插件**，与 DeepSeek 不存在隶属或官方背书关系。
 

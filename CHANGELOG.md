@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 安装声明扩到 DeepSeek Harness 0.2.x，0.1.7-rc.2 仍然在范围内。`engines.dsh` 是 `>=0.1.7-rc.2 <0.3.0`。已发布的 `@deepseek-ai/dsh-app-boot@0.2.1-rc.2` 在安装和 profile 启动时只看这个范围，同名 peer 不再参与；`0.1.7-rc.2` 和 `0.2.0-rc.2` 还不读 `engines.dsh`，而是拿每个 `@deepseek-ai/dsh-*` peer 去比正在运行的 DSH 版本（预发布版本参与比较）。所以 locale、conversation、primitives、fs、tools 的 peer 从钉死的 `0.1.7-rc.2` 放宽成同一个范围。`dsh-client-runtime` 在 npm 上仍停在 `0.1.1-rc.2`：peer 若写成 `>=0.1.7-rc.2 <0.3.0`，0.2 的 profile 在 pnpm 里会因为找不到这个版本而直接装失败，0.1.7 的 profile 则会对已经提供的 `0.1.1-rc.2` 报 unmet peer。它的 peer 因此是 `>=0.1.1-rc.2 <0.3.0`。兼容性检查比的是正在运行的 DSH 版本，这个下限仍然盖住 0.1.7-rc.2 和 0.2.x；0.1.6 会被其余下限为 `0.1.7-rc.2` 的 peer 挡在外面。开发依赖继续钉在已经测过的版本上。Node 要求维持 `>=22.13.0`，跟本仓库的 node-floor 和 pdfjs 一致。已发布的 `@deepseek-ai/dsh` 包没有 `engines.node`，DSH 仓库根清单里的 `^22.19.0 || >=24.0.0` 这次不往下套。版本号不动，这次也不发布。
 - npm 包名定为 `@baseland/dsh-evidence`（版本 `0.6.0-beta.1`）。npm 组织 `cooberped` 无法认领，改用维护者的 npm 账号 `baseland`。GitHub 仓库仍是 `Cooberped/dsh-evidence`。
 - 公开 Beta `0.6.0-beta.1` 已发布：npm `@baseland/dsh-evidence@0.6.0-beta.1`，GitHub pre-release `v0.6.0-beta.1`（commit `8bc0418593b4349ab4a6987d33cc86a21399a840`）。发出时 `beta` 和 `latest` 都指向这一版，因为这是包的第一个版本，npm 不允许删掉唯一的 `latest`。这不是稳定版。安装请用 `@beta`。这一版不包含随后的三处上传修正，见 `0.6.0-beta.2`。
 - 增加手动触发的发布 workflow（`.github/workflows/publish.yml`）。`0.6.0-beta.1` 已用 granular token 发出；以后的版本用 GitHub OIDC，不在仓库里存 `NPM_TOKEN`。workflow 使用 Node.js 24.5.0（自带 npm 11.5.1；更旧的 npm 做 OIDC 会报成 `E404`），默认只打 `beta` 标签，并等待名为 `release` 的环境保护。push 和 tag 都不会发布。这次改动本身不会发布新版本。
