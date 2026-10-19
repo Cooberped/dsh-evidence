@@ -35,9 +35,9 @@ That way, a file becomes evidence you can locate and read back on demand, instea
 
 ## Install
 
-You need the DeepSeek Harness CLI with the `web` profile (currently tested against npm `@deepseek-ai/dsh@0.1.7-rc.2`) and Node.js `>=22.13.0`. A source install also needs `pnpm` on `PATH`.
+You need the DeepSeek Harness CLI with the `web` profile and Node.js `>=22.13.0`. A source install also needs `pnpm` on `PATH`. Everyday use is still checked against npm `@deepseek-ai/dsh@0.1.7-rc.2`. The package also declares `engines.dsh` as `>=0.1.7-rc.2 <0.3.0`, so a 0.2.x host below 0.3.0 can install it as well.
 
-DeepSeek Harness 0.1.7 or higher is required. The current code uses the `…Regular` icon names and pins the `@deepseek-ai/dsh-*` peer dependencies at `0.1.7-rc.2`. On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. This repository has no release tag for the older versions; if you still need to run ≤ 0.1.6, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
+Harness 0.1.7-rc.2 is the floor. The upload control still uses the `…Regular` icon names. Those names are exported by `@deepseek-ai/dsh-client-ui-primitives@0.2.1-rc.2`, and the composer slots `conversation.input.left` and `conversation.input.dock` are still present in the 0.2.0-rc.2 and 0.2.1-rc.2 conversation client. On 0.1.6 and earlier the icons do not match. This repository has no release tag for those older versions; if you still need ≤ 0.1.6, use the code from before the icon change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files).
 
 ### From npm
 
@@ -221,7 +221,7 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 - PPTX charts, SmartArt, animations and embedded objects are not interpreted.
 - Upload quota locking is process-local, not a cross-process transaction.
 - Portable Node exposes no complete dirfd/openat chain, so a hostile same-UID process racing ancestor replacement remains an OS-isolation boundary.
-- Only Harness versions that have already been tested are covered. A newer version is not guaranteed until it is tested the same way.
+- The manifest accepts Harness 0.2.x below 0.3.0 so the plugin can install. End-to-end use is still what was checked on the 0.1.7-rc.2 web profile; smoke a newer host before you rely on it.
 
 </details>
 
@@ -231,10 +231,10 @@ Less common settings and their authoritative defaults live in [`src/index.ts`](s
 | --- | --- |
 | Project | Public source beta, independently maintained by Cooberped |
 | Currently tested against | npm `@deepseek-ai/dsh@0.1.7-rc.2` with the `web` profile |
-| Minimum version | **0.1.7 or higher.** On 0.1.6 and earlier, the upload icons do not match, and neither do the peer dependencies. To run an older Harness, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files). There is no release tag for those older versions |
+| Minimum version | **0.1.7-rc.2 or higher, below 0.3.0.** On 0.1.6 and earlier, the upload icons do not match. To run an older Harness, use the code from before that change, or upstream [`taxueseek/dsh-files`](https://github.com/taxueseek/dsh-files). There is no release tag for those older versions |
 | Tested with | OpenCode Go — DeepSeek V4 Flash |
 | npm | **Public beta** [`@baseland/dsh-evidence@0.6.0-beta.4`](https://www.npmjs.com/package/@baseland/dsh-evidence/v/0.6.0-beta.4) ([GitHub pre-release v0.6.0-beta.4](https://github.com/Cooberped/dsh-evidence/releases/tag/v0.6.0-beta.4)). Install with `@beta`. `latest` stays on `0.6.0-beta.1`, the first version npm published; this prerelease does not move it, and that is not a stable release. GitHub remains Cooberped. The npm scope is `baseland` because the organization `@cooberped` could not be claimed |
-| Compatibility | Newer Harness source versions have not been tested separately, so compatibility is not guaranteed yet |
+| Compatibility | `engines.dsh` is `>=0.1.7-rc.2 <0.3.0`. The `@deepseek-ai/dsh-*` peers use that same range, except `@deepseek-ai/dsh-client-runtime`, which is `>=0.1.1-rc.2 <0.3.0` because npm never published a newer copy. Harness 0.2.1 reads `engines.dsh` and ignores those peers. 0.1.7-rc.2 and 0.2.0-rc.2 still judge the peers. That is an install declaration; a full 0.2 session has not been re-checked here |
 
 This is **not an official DeepSeek plugin** and is not affiliated with or endorsed by DeepSeek.
 
